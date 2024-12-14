@@ -1,0 +1,94 @@
+/* General Styles */
+html, body {
+  height: 100%;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+body {
+    background-color: #f5f7fa;
+    font-family: 'Arial', sans-serif;
+    color: #333;
+  }
+  
+  /* Navbar Styles */
+  .navbar {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background-color: #283593;
+  }
+  
+  .navbar .nav-link {
+    color: #ffffff !important;
+    margin-right: 15px;
+  }
+  
+  .navbar .nav-link:hover {
+    color: #ffeb3b !important;
+  }
+  
+  /* Dropdown hover effect */
+  .navbar-nav .nav-item:hover .dropdown-menu {
+    display: block;
+  }
+  
+  /* Hero Section */
+  .hero {
+    background: url('https://vietnambeauty.com.vn/uploads/wp-content/uploads/2022/04/277930616_555491839231270_8216719033079141761_n.jpg') no-repeat center center/cover;
+    color: #fff;
+    padding: 100px 0;
+  }
+  
+  .hero h1 {
+    font-size: 3rem;
+  }
+  
+  .hero .btn-primary {
+    background-color: #ff7043;
+    border-color: #ff7043;
+  }
+  
+  /* Featured Books Section */
+  .row {
+    margin: 20px;
+  }
+  
+  .card {
+    border: none;
+    transition: transform 0.3s;
+  }
+  
+  .card:hover {
+    transform: scale(1.05);
+  }
+  
+  .card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+  
+  .card-body {
+    flex-grow: 1;
+    /* Ensure that the body of the card grows to fill the available space */
+  }
+  
+  .card-text {
+    min-height: 60px;
+    /* Set a minimum height for text to make the cards more uniform */
+  }
+  
+  /* Footer Styles */
+  footer {
+    background-color: #1a237e;
+    color: white;
+    padding: 1rem 0;
+    text-align: center;
+  }
+  
+  .social-icons i {
+    margin-right: 15px;
+    color: #ffeb3b;
+  }

@@ -1,0 +1,208 @@
+body {
+    background-color: #F4F7FA;
+    height: 100vh;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+header {
+    background-color: #34495E;
+    padding: 15px 20px;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1;
+    height: 60px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.header-left {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+}
+
+.user-info {
+    margin-right: 15px;
+    font-size: 1rem;
+    color: #ecf0f1;
+}
+
+.btn-logout {
+    background-color: #E74C3C;
+    border: none;
+    color: white;
+    padding: 8px 15px;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.btn-logout:hover {
+    background-color: #C0392B;
+}
+
+.container-fluid {
+    flex-grow: 1;
+    display: flex;
+    padding-top: 60px;
+}
+
+.sidebar {
+    background-color: #34495E;
+    padding: 20px;
+    width: 250px;
+    height: 87.5%;
+    position: fixed;
+    top: 60px;
+    left: 0;
+    bottom: 0;
+    z-index: 1;
+    box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.1);
+}
+
+.sidebar h4 {
+    color: white;
+    font-weight: bold;
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.sidebar a {
+    display: flex;
+    align-items: center;
+    color: #ECF0F1;
+    padding: 10px;
+    border-radius: 10px;
+    text-decoration: none;
+    margin-bottom: 10px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.sidebar a:hover,
+.sidebar a.active {
+    background-color: #1ABC9C;
+    color: white;
+}
+
+.sidebar a i {
+    margin-right: 10px;
+}
+
+.content {
+    flex-grow: 1;
+    margin-left: 270px;
+    padding: 40px;
+    background-color: #ECF0F1;
+    border-radius: 15px;
+    box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.1);
+    margin-right: 20px;
+    margin-bottom: 80px;
+    /* Thêm khoảng cách để footer không bị che */
+    margin-top: 20px;
+}
+
+
+.content h2 {
+    color: #34495E;
+    font-weight: bold;
+    margin-bottom: 30px;
+}
+
+footer {
+    background-color: #34495E;
+    color: white;
+    padding: 10px 20px;
+    text-align: center;
+    position: sticky;
+    /* Đảm bảo footer luôn hiển thị ở cuối */
+    bottom: 0;
+    width: 100%;
+    box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.table {
+    border-radius: 10px;
+    overflow: hidden;
+    /* Để border-radius có tác dụng */
+}
+
+.table th {
+    background-color: #34495E;
+    /* Màu nền cho header bảng */
+    color: white;
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: #f9f9f9;
+    /* Màu nền cho hàng lẻ */
+}
+
+.table-bordered td,
+.table-bordered th {
+    border: 1px solid #dee2e6;
+    /* Đường viền cho các ô */
+}
+
+
+.btn-custom {
+    background-color: #1ABC9C;
+    border: none;
+    border-radius: 5px;
+    color: white;
+    padding: 10px 20px;
+    transition: background-color 0.3s ease;
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    /* Căn giữa phân trang */
+    align-items: center;
+    /* Căn giữa dọc */
+}
+
+.page-item {
+    margin: 0 5px;
+    /* Khoảng cách giữa các phần tử */
+}
+
+.page-link {
+    border-radius: 5px;
+    /* Bo góc cho các liên kết */
+    padding: 10px 15px;
+    /* Thêm khoảng đệm cho các liên kết */
+    transition: background-color 0.3s;
+    /* Hiệu ứng chuyển màu khi hover */
+}
+
+.page-link:hover {
+    background-color: #1ABC9C;
+    /* Màu nền khi hover */
+    color: white;
+    /* Màu chữ khi hover */
+}
+
+.page-item.disabled .page-link {
+    pointer-events: none;
+    /* Ngăn không cho nhấn vào nút đã bị vô hiệu hóa */
+    background-color: #d6d6d6;
+    /* Màu nền cho nút vô hiệu hóa */
+    color: #aaa;
+    /* Màu chữ cho nút vô hiệu hóa */
+}
+
+.btn-custom:hover {
+    background-color: #16A085;
+}

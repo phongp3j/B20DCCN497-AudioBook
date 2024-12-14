@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard</title>
+  <!-- Link Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Link Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+  <!-- Link custom CSS -->
+  <link href="../css/Admin.css" rel="stylesheet">
+</head>
+
+<body>
+<!-- Header -->
+<header>
+  <div class="header-left">Admin Dashboard</div>
+  <div class="header-right">
+    <span class="user-info">Xin chào, Admin</span>
+    <button class="btn btn-logout" onclick="logout()">Đăng xuất</button>
+  </div>
+</header>
+
+<!-- Main Content Area -->
+<div class="container-fluid">
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <a href="#" id="userManagement"><i class="fas fa-users"></i> Quản lý người dùng</a>
+    <a href="#" id="categoryManagement"><i class="fas fa-list"></i> Quản lý danh mục</a>
+    <a href="#" id="bookManagement"><i class="fas fa-book"></i> Quản lý sách</a>
+  </div>
+
+  <!-- Main Content -->
+  <div class="content">
+    <h2>Chào mừng đến trang quản lý</h2>
+    <div id="mainContent">
+      <p>Chọn một mục từ menu bên trái để quản lý.</p>
+    </div>
+    <!-- Modal Xác nhận Xóa -->
+    <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel"
+         aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="confirmDeleteModalLabel">Xác nhận xóa</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <p>Bạn có chắc chắn muốn xóa người dùng này?</p>
+            <p><strong>Tên người dùng:</strong> <span id="modalUsername"></span></p>
+            <p><strong>Họ và tên:</strong> <span id="modalFullname"></span></p>
+            <p><strong>Số điện thoại:</strong> <span id="modalPhonenumber"></span></p>
+            <p><strong>Email:</strong> <span id="modalEmail"></span></p>
+            <p><strong>Vai trò:</strong> <span id="modalRole"></span></p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+            <button type="button" class="btn btn-danger" id="confirmDeleteButton">Xác nhận</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Modal Chỉnh sửa người dùng -->
+    <div class="modal fade" id="editUserModal" tabindex="-1" aria-labelledby="editUserModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="editUserModalLabel">Chỉnh sửa thông tin người dùng</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form id="editUserForm">
+              <div class="mb-3">
+                <label for="editUsername" class="form-label">Tên người dùng</label>
+                <input type="text" class="form-control" id="editUsername" disabled>
+              </div>
+              <div class="mb-3">
+                <label for="editFullname" class="form-label">Họ và tên</label>
+                <input type="text" class="form-control" id="editFullname">
+              </div>
+              <div class="mb-3">
+                <label for="editPhonenumber" class="form-label">Số điện thoại</label>
+                <input type="text" class="form-control" id="editPhonenumber">
+              </div>
+              <div class="mb-3">
+                <label for="editEmail" class="form-label">Email</label>
+                <input type="email" class="form-control" id="editEmail">
+              </div>
+              <div class="mb-3">
+                <label for="editRole" class="form-label">Vai trò</label>
+                <select class="form-select" id="editRole">
+                  <option value="ADMIN">Admin</option>
+                  <option value="USER">User</option>
+                </select>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+            <button type="button" class="btn btn-primary" id="saveUserButton">Lưu</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Thêm bảng người dùng -->
+    <div id="userTable" class="d-none">
+      <h3>Quản lý người dùng</h3>
+      <div class="input-group mb-3">
+        <input type="text" id="searchInput" class="form-control" placeholder="Tìm kiếm người dùng...">
+        <button class="btn btn-outline-secondary" type="button" id="searchButton"
+                style="margin-left: 10px; background-color: #1ABC9C; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; transition: background-color 0.3s ease;"
+                onmouseover="this.style.backgroundColor='#16A085'" onmouseout="this.style.backgroundColor='#1ABC9C'">Tìm
+          kiếm</button>
+      </div>
+
+      <table class="table table-bordered table-striped">
+        <thead class="table-dark">
+        <tr>
+          <th>Tên người dùng</th>
+          <th>Họ và tên</th>
+          <th>Số điện thoại</th>
+          <th>Email</th>
+          <th>Vai trò</th>
+          <th>Thao tác</th>
+        </tr>
+        </thead>
+        <tbody id="userTableBody">
+        <!-- Dữ liệu người dùng sẽ được chèn vào đây -->
+        </tbody>
+      </table>
+      <nav aria-label="Page navigation">
+        <ul class="pagination justify-content-center">
+          <li class="page-item" id="prevPage"><a class="page-link" href="#">Trước</a></li>
+          <li class="page-item disabled" id="pageInfo"><a class="page-link" href="#">Trang 1 / 1</a></li>
+          <li class="page-item" id="nextPage"><a class="page-link" href="#">Tiếp theo</a></li>
+        </ul>
+      </nav>
+    </div>
+
+    <!--bảng quản lý category-->
+    <!-- Modal Thêm danh mục -->
+    <div class="modal fade" id="addCategoryModal" tabindex="-1" aria-labelledby="addCategoryModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="addCategoryModalLabel">Thêm danh mục mới</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-3">
+              <label for="categoryName" class="form-label">Tên danh mục</label>
+              <input type="text" class="form-control" id="categoryName" placeholder="Nhập tên danh mục">
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+            <button type="button" class="btn btn-primary" id="addCategoryButton">Thêm</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="categoryTable" class="d-none">
+      <h3>Quản lý danh mục</h3>
+      <div class="input-group mb-3">
+        <input type="text" id="categorySearchInput" class="form-control" placeholder="Tìm kiếm danh mục...">
+        <button class="btn btn-outline-secondary" type="button" id="categorySearchButton"
+                style="margin-left: 10px; background-color: #1ABC9C; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; transition: background-color 0.3s ease;"
+                onmouseover="this.style.backgroundColor='#16A085'" onmouseout="this.style.backgroundColor='#1ABC9C'">Tìm kiếm</button>
+      </div>
+      <button class="btn btn-outline-secondary" type="button" id="categoryAddButton"
+              style="margin-bottom:10px; background-color: #1ABC9C; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; transition: background-color 0.3s ease;"
+              onmouseover="this.style.backgroundColor='#16A085'" onmouseout="this.style.backgroundColor='#1ABC9C'">Thêm danh mục</button>
+      <table class="table table-bordered table-striped">
+        <thead class="table-dark">
+        <tr>
+          <th>ID</th>
+          <th>Tên danh mục</th>
+          <th>Số lượng sách trong CSDL</th>
+          <th>Thao tác</th>
+        </tr>
+        </thead>
+        <tbody id="categoryTableBody">
+        </tbody>
+      </table>
+      <nav aria-label="Page navigation">
+        <ul class="pagination justify-content-center">
+          <li class="page-item" id="categoryPrevPage"><a class="page-link" href="#">Trước</a></li>
+          <li class="page-item disabled" id="categoryPageInfo"><a class="page-link" href="#">Trang 1 / 1</a></li>
+          <li class="page-item" id="categoryNextPage"><a class="page-link" href="#">Tiếp theo</a></li>
+        </ul>
+      </nav>
+    </div>
+    <!-- Modal Chỉnh sửa danh mục -->
+    <div class="modal fade" id="editCategoryModal" tabindex="-1" aria-labelledby="editCategoryModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="editCategoryModalLabel">Chỉnh sửa thông tin danh mục</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form id="editCategoryForm">
+              <div class="mb-3">
+                <label for="editCategory" class="form-label">Tên danh mục</label>
+                <input type="text" class="form-control" id="editCategory" >
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+            <button type="button" class="btn btn-primary" id="saveCategoryButton">Lưu</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Modal Xác nhận Xóa danh mục -->
+    <div class="modal fade" id="confirmDeleteModalCategory" tabindex="-1" aria-labelledby="confirmDeleteModalLabel"
+         aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="confirmDeleteModalCategoryLabel">Xác nhận xóa</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <p>Bạn có chắc chắn muốn xóa danh mục này?
+            <br>Việc xóa sẽ xóa hết các phần liên quan đến danh mục?</p>
+            <p><strong>Tên danh mục:</strong> <span id="modalCategory"></span></p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+            <button type="button" class="btn btn-danger" id="confirmDeleteCategoryButton">Xác nhận</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!--Modal Quản lý sách -->
+    <div id="bookTable" class="d-none">
+      <h3>Quản lý sách</h3>
+      <div class="input-group mb-3">
+        <input type="text" id="bookSearchInput" class="form-control" placeholder="Tìm kiếm sách...">
+        <button class="btn btn-outline-secondary" type="button" id="bookSearchButton"
+                style="margin-left: 10px; background-color: #1ABC9C; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; transition: background-color 0.3s ease;"
+                onmouseover="this.style.backgroundColor='#16A085'" onmouseout="this.style.backgroundColor='#1ABC9C'">Tìm kiếm</button>
+      </div>
+      <button class="btn btn-outline-secondary" type="button" id="bookAddButton"
+              style="margin-bottom:10px; background-color: #1ABC9C; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; transition: background-color 0.3s ease;"
+              onmouseover="this.style.backgroundColor='#16A085'" onmouseout="this.style.backgroundColor='#1ABC9C'"  onclick="window.location.href='/addbook'">Thêm sách</button>
+      <table class="table table-bordered table-striped">
+        <thead class="table-dark">
+        <tr>
+          <th>ID</th>
+          <th>Ảnh bìa</th>
+          <th>Tên sách</th>
+          <th>Danh mục</th>
+          <th>Tác giả</th>
+          <th>Mô tả</th>
+          <th>Thao tác</th>
+        </tr>
+        </thead>
+        <tbody id="bookTableBody">
+        </tbody>
+      </table>
+      <nav aria-label="Page navigation">
+        <ul class="pagination justify-content-center">
+          <li class="page-item" id="bookPrevPage"><a class="page-link" href="#">Trước</a></li>
+          <li class="page-item disabled" id="bookPageInfo"><a class="page-link" href="#">Trang 1 / 1</a></li>
+          <li class="page-item" id="bookNextPage"><a class="page-link" href="#">Tiếp theo</a></li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+<!-- Footer -->
+<footer>
+  <p>&copy; 2024 Admin Dashboard. All rights reserved.</p>
+</footer>
+<!-- Link Bootstrap JS, Popper.js và custom JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<script src="../js/Admin.js"></script>
+</body>
+
+</html>

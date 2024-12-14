@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Listen to Audiobook</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../css/Home.css">
+    <style>
+        /* Đảm bảo footer luôn ở cuối trang */
+        html,
+        body {
+          height: 100%;
+          margin: 0;
+        }
+
+        body {
+          display: flex;
+          flex-direction: column;
+        }
+
+        /* Chiếm không gian còn lại */
+        main {
+          flex: 1;
+        }
+
+        footer {
+          background-color: #343a40;
+          color: white;
+          text-align: center;
+          padding: 1rem;
+          margin-top: auto;
+        }
+
+        .social-icons a {
+          color: white;
+          margin: 0 10px;
+          text-decoration: none;
+        }
+
+        .social-icons a:hover {
+          color: #007bff;
+        }
+
+        /* Custom styling for book and chapters */
+        .book-container {
+          display: flex;
+          flex-direction: column;
+          gap: 20px;
+        }
+
+        #bookImage {
+          border-radius: 10px;
+          box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        #bookTitle {
+          font-size: 2.5rem;
+          font-weight: bold;
+          color: #343a40;
+        }
+
+        #bookDescription {
+          font-size: 1.2rem;
+          color: #6c757d;
+        }
+
+        .chapter {
+          margin-bottom: 20px;
+        }
+
+        .chapter h3 {
+          font-size: 1.5rem;
+          font-weight: bold;
+          color: #007bff;
+        }
+
+        .chapter ul {
+          list-style-type: none;
+          padding-left: 0;
+        }
+
+        .chapter li {
+          background-color: #f8f9fa;
+          border-radius: 10px;
+          padding: 15px;
+          margin-bottom: 10px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+        }
+
+        .chapter li strong {
+          font-size: 1.2rem;
+          color: #495057;
+        }
+
+        audio {
+          width: 300px;
+          height: 40px;
+        }
+
+        #loginMessage {
+          font-size: 1.1rem;
+        }
+    </style>
+</head>
+
+<body>
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container">
+        <a class="navbar-brand" href="/home"><i class="fas fa-book"></i> Audiobook</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="/home"><i class="fas fa-home"></i> Home</a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="categoriesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-list"></i> Categories
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="categoriesDropdown" id="categoriesMenu">
+                        <!-- Categories will be populated here dynamically -->
+                    </ul>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#"><i class="fas fa-info-circle"></i> Book</a>
+                </li>
+            </ul>
+            <!-- Search Form -->
+            <form class="d-flex ms-lg-3">
+                <input class="form-control me-2" type="search" placeholder="Search Audiobooks" aria-label="Search">
+                <button class="btn btn-outline-light" type="submit"><i class="fas fa-search"></i></button>
+            </form>
+            <ul class="navbar-nav ms-lg-3">
+                <!-- Login/Logout Links -->
+                <li class="nav-item" id="authLink">
+                    <!-- Will be dynamically populated -->
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- Main Content -->
+<section class="py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4">
+                <img id="bookImage" src="" class="img-fluid" alt="Book Cover">
+            </div>
+            <div class="col-md-8 book-container">
+                <h1 id="bookTitle"></h1>
+                <p id="bookDescription"></p>
+                <!-- Chapters and Audios Section -->
+                <div id="chaptersSection">
+                    <div id="chapterList" class="mb-4">
+                        <!-- Chapters and audios will be dynamically populated here -->
+                    </div>
+                </div>
+                <!-- Message when not logged in -->
+                <p id="loginMessage" class="text-danger d-none">You must log in to listen to the audiobook.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer class="bg-dark text-white py-4">
+    <div class="container text-center">
+        <p>&copy; 2024 Audiobook. All rights reserved.</p>
+        <div class="social-icons">
+            <a href="#"><i class="fab fa-facebook-f"></i></a>
+            <a href="#"><i class="fab fa-twitter"></i></a>
+            <a href="#"><i class="fab fa-instagram"></i></a>
+        </div>
+    </div>
+</footer>
+
+<!-- Bootstrap JS and Popper.js -->
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.7/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.min.js"></script>
+<!-- Custom JS -->
+<script>
+    async function fetchBookDetails() {
+      const bookId = localStorage.getItem('selectedBookIdToListen');
+      if (!bookId) {
+        console.error('No book ID found in localStorage');
+        return;
+      }
+      console.log(bookId);
+      try {
+        const response = await fetch(`http://localhost:8080/book/${bookId}`);
+        const book = await response.json();
+        console.log(book);
+        // Populate the page with book details
+        document.getElementById('bookTitle').textContent = book.title;
+        document.getElementById('bookDescription').textContent = book.description;
+        document.getElementById('bookImage').src = book.image;
+
+        // Check if chapters exist
+        if (book.listChapter && book.listChapter.length > 0) {
+          const chapterList = document.getElementById('chapterList');
+          chapterList.innerHTML = ''; // Clear previous content
+
+          book.listChapter.forEach(chapter => {
+            // Create HTML structure for each chapter
+            let chapterHTML = `
+                        <div class="chapter">
+                            <h3>${chapter.title_chapter}</h3>
+                            <ul class="list-group">`;
+
+            // Add audio files for each chapter
+            chapter.listAudio.forEach(audio => {
+              chapterHTML += `
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <strong>${audio.audio_name}</strong>
+                                <audio controls>
+                                    <source src="${audio.audio_file}" type="audio/mpeg">
+                                    Your browser does not support the audio element.
+                                </audio>
+                            </li>`;
+            });
+
+            // Close the ul and div tags
+            chapterHTML += `</ul></div>`;
+
+            // Insert the HTML using insertAdjacentHTML
+            chapterList.insertAdjacentHTML('beforeend', chapterHTML);
+          });
+        } else {
+          console.log('No chapters available for this book.');
+        }
+      } catch (error) {
+        console.error('Error fetching book details:', error);
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+      const userData = JSON.parse(localStorage.getItem('userData'));
+      const authLinks = document.querySelector('.navbar-nav.ms-lg-3');
+      const chaptersSection = document.getElementById('chaptersSection');
+      const loginMessage = document.getElementById('loginMessage');
+
+      if (userData) {
+        const userDropdown = `
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-user"></i> ${userData.username}
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="userDropdown">
+                        <li><a class="dropdown-item" href="#"><i class="fas fa-user-circle"></i> Hồ sơ</a></li>
+                        <li><a class="dropdown-item" href="#" id="logoutLink"><i class="fas fa-sign-out-alt"></i> Đăng xuất</a></li>
+                    </ul>
+                </li>
+            `;
+        authLinks.innerHTML = userDropdown;
+        chaptersSection.style.display = 'block';
+        loginMessage.classList.add('d-none');
+
+        document.getElementById('logoutLink').addEventListener('click', function () {
+          localStorage.removeItem('userData');
+          window.location.reload();
+        });
+      } else {
+        const loginLink = `
+                <li class="nav-item">
+                    <a class="nav-link" href="/login"><i class="fas fa-sign-in-alt"></i> Đăng nhập</a>
+                </li>
+            `;
+        authLinks.innerHTML = loginLink;
+        chaptersSection.style.display = 'none';
+        loginMessage.classList.remove('d-none');
+      }
+    });
+    async function fetchCategories() {
+    try {
+        const response = await fetch('http://localhost:8080/category/getCategories');
+        const categories = await response.json();
+        const categoriesMenu = document.getElementById('categoriesMenu');
+        categories.forEach(category => {
+            const categoryItem = `
+                    <li><a class="dropdown-item" href="/category/${category.id}">
+                        <i class="fas fa-book-open"></i> ${category.name}
+                    </a></li>
+                `;
+            categoriesMenu.innerHTML += categoryItem;
+        });
+    } catch (error) {
+        console.error('Error fetching categories:', error);
+    }
+}
+    document.addEventListener("DOMContentLoaded", function () {
+      fetchBookDetails();
+      fetchCategories();
+    });
+</script>
+</body>
+
+</html>

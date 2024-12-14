@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý Chương Sách</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .container {
+          margin-top: 20px;
+          max-width: 800px;
+        }
+
+        .chapter-container,
+        .audio-container {
+          border: 1px solid #ddd;
+          padding: 15px;
+          margin-bottom: 20px;
+          border-radius: 8px;
+          background-color: #f9f9f9;
+        }
+
+        .chapter-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        }
+
+        .audio-container {
+          padding: 10px;
+          margin-top: 10px;
+        }
+
+        .btn-outline-secondary {
+          margin-right: 10px;
+        }
+
+        .loading {
+          display: none;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+    <h1 class="text-center mb-4">Quản lý Chương Sách</h1>
+
+    <!-- Buttons -->
+    <div class="d-flex justify-content-between mb-4">
+        <button class="btn btn-secondary" onclick="window.location.href='UpdateBookAdmin.html'">Quay lại</button>
+        <button class="btn btn-primary" onclick="addNewChapter()">Thêm chương mới</button>
+    </div>
+    <!-- Modal thêm chương-->
+    <div class="modal fade" id="addChapterModal" tabindex="-1" aria-labelledby="addChapterModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addChapterModalLabel">Thêm chương mới</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="chapterTitle" class="form-label">Tên chương</label>
+                        <input type="text" class="form-control" id="chapterTitleAdd" placeholder="Nhập tên chương">
+                    </div>
+                    <div class="mb-3">
+                        <label for="chapterContent" class="form-label">Nội dung</label>
+                        <textarea class="form-control" id="chapterContent" rows="5" placeholder="Nhập nội dung chương"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-primary" onclick="submitNewChapter()">Thêm mới</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Chapter List -->
+    <div id="chapter-list">
+        <!-- Chapters will be dynamically inserted here -->
+    </div>
+
+    <!-- Edit Chapter Modal -->
+    <div class="modal fade" id="editChapterModal" tabindex="-1" aria-labelledby="editChapterModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editChapterModalLabel">Chỉnh sửa chương</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editChapterForm">
+                        <div class="mb-3">
+                            <label for="chapterTitle" class="form-label">Tiêu đề chương</label>
+                            <input type="text" class="form-control" id="chapterTitle" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="chapterText" class="form-label">Nội dung chương</label>
+                            <textarea class="form-control" id="chapterText" rows="14" required></textarea>
+                        </div>
+                        <input type="hidden" id="chapterId">
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-primary" onclick="updateChapter()">Cập nhật</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirm Delete Modal chapter-->
+    <div class="modal fade" id="confirmDeleteChapterModal" tabindex="-1" aria-labelledby="confirmDeleteLabel"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmDeleteLabel">Xác nhận xóa</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Bạn có chắc chắn muốn xóa chương này không?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-danger" id="confirmDeleteChapterBtn">Xác nhận</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap Modal for Adding New Audio -->
+    <div class="modal fade" id="addAudioModal" tabindex="-1" aria-labelledby="addAudioModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addAudioModalLabel">Thêm audio mới</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addAudioForm">
+                        <div class="mb-3">
+                            <label for="audioName" class="form-label">Tên Audio</label>
+                            <input type="text" class="form-control" id="audioName" placeholder="Nhập tên audio" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="audioFile" class="form-label">Chọn file audio</label>
+                            <input type="file" class="form-control" id="audioFile" accept="audio/*" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-primary" id="confirmAddAudioBtn">Thêm</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Bootstrap Modal for Confirmation -->
+    <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-labelledby="deleteConfirmLabel"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteConfirmLabel">Xác nhận xóa</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Bạn có chắc chắn muốn xóa audio này không?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-danger" id="confirmDeleteAudioBtn">Xóa</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal sửa audio -->
+    <div class="modal fade" id="editAudioModal" tabindex="-1" aria-labelledby="editAudioModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editAudioModalLabel">Sửa Audio</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="editAudioName" class="form-label">Tên Audio</label>
+                        <input type="text" class="form-control" id="editAudioName" placeholder="Nhập tên audio">
+                    </div>
+                    <div class="mb-3">
+                        <label for="editAudioFile" class="form-label">Chọn File Audio</label>
+                        <input type="file" class="form-control" id="editAudioFile">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-primary" id="confirmEditAudioBtn">Cập nhật</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', async function () {
+      await loadChapters();
+    });
+    async function loadChapters() {
+      const bookId = localStorage.getItem('bookIdToUpdateAdmin');
+      try {
+        const response = await fetch(`http://localhost:8080/book/${bookId}`);
+        const data = await response.json();
+        if (data.listChapter && data.listChapter.length > 0) {
+          const chapterList = document.getElementById('chapter-list');
+          chapterList.innerHTML = '';
+          data.listChapter.forEach((chapter, index) => {
+            const chapterHtml = `
+                        <div class="chapter-container" id="chapter-${index}">
+                            <div class="chapter-header">
+                                <h5>${chapter.title_chapter}</h5>
+                                <div>
+                                    <button class="btn btn-outline-primary btn-sm" onclick="editChapter(${chapter.id},'${encodeURIComponent(chapter.title_chapter)}','${encodeURIComponent(chapter.text)}')">Chỉnh sửa</button>
+                                    <button class="btn btn-danger btn-sm" onclick="deleteChapter(${chapter.id})">Xóa</button>
+                                </div>
+                            </div>
+                            <p>${chapter.text}</p>
+                            <div class="audio-list">
+                                ${chapter.listAudio.map((audio, i) => `
+                                    <div class="audio-container">
+                                        <p>${audio.audio_name}</p>
+                                        <audio class="audio-player" controls>
+                                        <source src="${audio.audio_file}" type="audio/mpeg">
+                                            Trình duyệt của bạn không hỗ trợ phát âm thanh.
+                                        </audio>
+                                        <div class="d-flex justify-content-between">
+                                            <button class="btn btn-outline-primary btn-sm" onclick="editAudio(${audio.id},'${audio.audio_name}','${audio.audio_file}')">Sửa</button>
+                                            <button class="btn btn-danger btn-sm" onclick="deleteAudio(${audio.id})">Xóa</button>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                            <button class="btn btn-success mt-2" onclick="addNewAudio(${chapter.id})">Thêm audio mới</button>
+                        </div>
+                    `;
+            chapterList.insertAdjacentHTML('beforeend', chapterHtml);
+          });
+        } else {
+          document.getElementById('chapter-list').innerHTML = '<p>Chưa có chương nào.</p>';
+        }
+      } catch (error) {
+        console.error('Error fetching chapters:', error);
+        alert('Có lỗi xảy ra khi tải chương.');
+      }
+    }
+    //////////////////////////////////////////////////////////////biến để sử dụng
+    let selectedAudioId = null;
+    let selectedChapterId = null;
+    let chapterToDelete = null;
+    //////////////////////////////////////////////////////////////thêm chương mới
+    function addNewChapter() {
+      // Hiện modal
+      var modal = new bootstrap.Modal(document.getElementById('addChapterModal'));
+      modal.show();
+    }
+    async function submitNewChapter() {
+      const chapterTitle = document.getElementById('chapterTitleAdd').value;
+      const chapterContent = document.getElementById('chapterContent').value;
+      // Gói thông tin để gửi
+      const chapterData = {
+        chapter_title: chapterTitle,
+        text: chapterContent,
+        book_id: localStorage.getItem('bookIdToUpdateAdmin')
+      };
+      try {
+        // Gọi API
+        const response = await fetch('http://localhost:8080/chapter', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(chapterData)
+        });
+        if (response.ok) {
+          // Xử lý nếu thành công
+          alert('Chương mới đã được thêm thành công!');
+          // Đóng modal
+          var modal = bootstrap.Modal.getInstance(document.getElementById('addChapterModal'));
+          modal.hide();
+          await loadChapters(); // Reload the chapters after update
+        } else {
+          // Xử lý lỗi
+          alert('Có lỗi xảy ra khi thêm chương!');
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        alert('Có lỗi xảy ra!');
+      }
+    }
+    ////////////////////////////////////////////////////////////// cập nhật chương
+    function editChapter(id, etitle, etext) {
+      const title = decodeURIComponent(etitle);
+      const text = decodeURIComponent(etext);
+      document.getElementById('chapterId').value = id;
+      document.getElementById('chapterTitle').value = title;
+      document.getElementById('chapterText').value = text;
+      console.log(title, text);
+      const editModal = new bootstrap.Modal(document.getElementById('editChapterModal'));
+      editModal.show();
+    }
+    async function updateChapter() {
+      const chapterId = document.getElementById('chapterId').value;
+      const chapterTitle = document.getElementById('chapterTitle').value;
+      const chapterText = document.getElementById('chapterText').value;
+      const bookId = localStorage.getItem('bookIdToUpdateAdmin');
+      const chapterData = {
+        chapter_title: chapterTitle,
+        text: chapterText,
+        book_id: bookId
+      };
+      try {
+        const response = await fetch(`http://localhost:8080/chapter/${chapterId}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(chapterData)
+        });
+        if (response.ok) {
+          alert('Chương đã được cập nhật thành công.');
+          await loadChapters(); // Reload the chapters after update
+          const editModal = bootstrap.Modal.getInstance(document.getElementById('editChapterModal'));
+          editModal.hide();
+        } else {
+          alert('Cập nhật chương thất bại.');
+        }
+      } catch (error) {
+        console.error('Error updating chapter:', error);
+        alert('Có lỗi xảy ra khi cập nhật chương.');
+      }
+    }
+    ////////////////////////////////////////////////////////////////////////////Xóa chương
+    function deleteChapter(id) {
+      chapterToDelete = id;
+      const deleteModal = new bootstrap.Modal(document.getElementById('confirmDeleteChapterModal'));
+      deleteModal.show();
+    }
+    document.getElementById('confirmDeleteChapterBtn').addEventListener('click', async function () {
+      if (chapterToDelete) {
+        try {
+          const response = await fetch(`http://localhost:8080/chapter/${chapterToDelete}`, {
+            method: 'DELETE',
+          });
+          if (response.ok) {
+            alert('Chương đã được xóa thành công');
+            await loadChapters();
+          } else {
+            alert('Có lỗi xảy ra khi xóa chương.');
+          }
+        } catch (error) {
+          console.error('Error deleting chapter:', error);
+          alert('Có lỗi xảy ra khi xóa chương.');
+        }
+        // Ẩn modal sau khi xóa
+        const deleteModal = bootstrap.Modal.getInstance(document.getElementById('confirmDeleteChapterModal'));
+        deleteModal.hide();
+      }
+    });
+    //////////////////////////////////////////////////////////////////////////////////thêm audio mới
+    function addNewAudio(chapterId) {
+      selectedChapterId = chapterId; // Lưu ID của chương hiện tại
+      const addAudioModal = new bootstrap.Modal(document.getElementById('addAudioModal'));
+      addAudioModal.show(); // Hiển thị modal thêm audio
+    }
+    // Xử lý khi nhấn nút "Thêm" trong hộp thoại thêm audio mới
+    document.getElementById('confirmAddAudioBtn').addEventListener('click', async function () {
+      const audioName = document.getElementById('audioName').value;
+      const audioFile = document.getElementById('audioFile').files[0];
+      if (!audioName || !audioFile) {
+        alert('Vui lòng nhập tên audio và chọn file.');
+        return;
+      }
+      try {
+        // Gọi API /generatePath để lấy URL của file audio
+        const formData = new FormData();
+        formData.append('file', audioFile);
+        const generatePathResponse = await fetch('http://localhost:8080/generatePath', {
+          method: 'POST',
+          body: formData,
+        });
+        if (!generatePathResponse.ok) {
+          alert('Có lỗi xảy ra khi upload file audio.');
+          return;
+        }
+        const audioUrl = await generatePathResponse.text(); // URL của file audio được trả về từ API /generatePath
+        // Sau khi có URL, gọi API /audio để lưu audio
+        const audioData = {
+          audio_name: audioName,
+          audio_file: audioUrl,
+          chapter_id: selectedChapterId,
+        };
+        const audioResponse = await fetch('http://localhost:8080/audio', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(audioData),
+        });
+        if (audioResponse.ok) {
+          // Nếu thêm thành công, tải lại danh sách chương
+          await loadChapters();
+          const addAudioModal = bootstrap.Modal.getInstance(document.getElementById('addAudioModal'));
+          addAudioModal.hide(); // Ẩn modal sau khi thêm thành công
+        } else {
+          alert('Có lỗi xảy ra khi thêm audio.');
+        }
+      } catch (error) {
+        console.error('Error adding audio:', error);
+        alert('Có lỗi xảy ra khi thêm audio.');
+      }
+    });
+    ////////////////////////////////////////////////////////////////
+    function editAudio(audioId, audioName, audioFile) {
+      console.log("Đã ấn");
+      // Hiển thị giá trị hiện tại trong modal
+      document.getElementById('editAudioName').value = audioName;
+      document.getElementById('editAudioFile').value = '';
+      // Lưu lại audioId để cập nhật sau
+      document.getElementById('editAudioModal').dataset.audioId = audioId;
+      document.getElementById('editAudioModal').dataset.audioFile = audioFile;
+      // Hiển thị modal sửa audio
+      const editAudioModal = new bootstrap.Modal(document.getElementById('editAudioModal'));
+      editAudioModal.show();
+    }
+    // Xử lý khi nhấn nút "Cập nhật" trong hộp thoại sửa audio
+    document.getElementById('confirmEditAudioBtn').addEventListener('click', async function () {
+      const audioId = document.getElementById('editAudioModal').dataset.audioId;
+      const oldAudioFile = document.getElementById('editAudioModal').dataset.audioFile;
+      const audioName = document.getElementById('editAudioName').value;
+      const audioFile = document.getElementById('editAudioFile').files[0];
+      if (!audioName) {
+        alert('Vui lòng nhập tên audio.');
+        return;
+      }
+      try {
+        let audioUrl = oldAudioFile; // Giữ URL cũ nếu không có file mới được chọn
+        if (audioFile) {
+          // Nếu người dùng chọn file mới, gọi API /generatePath để lấy URL của file audio
+          const formData = new FormData();
+          formData.append('file', audioFile);
+          const generatePathResponse = await fetch('http://localhost:8080/generatePath', {
+            method: 'POST',
+            body: formData,
+          });
+          if (!generatePathResponse.ok) {
+            alert('Có lỗi xảy ra khi upload file audio.');
+            return;
+          }
+          audioUrl = await generatePathResponse.text(); // URL mới của file audio được trả về từ API /generatePath
+        }
+        // Gọi API để cập nhật thông tin audio
+        const audioData = {
+          audio_name: audioName,
+          audio_file: audioUrl,
+          chapter_id: selectedChapterId, // ID của chapter hiện tại
+        };
+        const audioResponse = await fetch(`http://localhost:8080/audio/${audioId}`, {
+          method: 'PUT', // Sử dụng PUT cho cập nhật
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(audioData),
+        });
+        if (audioResponse.ok) {
+          // Nếu cập nhật thành công, tải lại danh sách chương
+          await loadChapters();
+          const editAudioModal = bootstrap.Modal.getInstance(document.getElementById('editAudioModal'));
+          editAudioModal.hide(); // Ẩn modal sau khi cập nhật thành công
+        } else {
+          alert('Có lỗi xảy ra khi cập nhật audio.');
+        }
+      } catch (error) {
+        console.error('Error updating audio:', error);
+        alert('Có lỗi xảy ra khi cập nhật audio.');
+      }
+    });
+    ////////////////////////////////////////////////////////////////////////Xóa audio
+    function deleteAudio(audioId) {
+      selectedAudioId = audioId;
+      const deleteModal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
+      deleteModal.show(); // Hiển thị modal xác nhận
+    }
+    // Xử lý khi nhấn nút "Xóa" trong hộp thoại xác nhận
+    document.getElementById('confirmDeleteAudioBtn').addEventListener('click', async function () {
+      if (selectedAudioId) {
+        try {
+          const response = await fetch(`http://localhost:8080/audio/${selectedAudioId}`, {
+            method: 'DELETE',
+          });
+          if (response.ok) {
+            await loadChapters();
+          } else {
+            alert('Có lỗi xảy ra khi xóa audio.');
+          }
+        } catch (error) {
+          console.error('Error deleting audio:', error);
+          alert('Có lỗi xảy ra khi xóa audio.');
+        } finally {
+          const deleteModal = bootstrap.Modal.getInstance(document.getElementById('deleteConfirmModal'));
+          deleteModal.hide();
+        }
+      }
+    });
+</script>
+</body>
+
+</html>

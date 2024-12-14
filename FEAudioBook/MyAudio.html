@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Audiobook Home</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Font Awesome Icons -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="./CSS/Home.css">
+  <link rel="stylesheet" href="./CSS/ProgressBar.css">
+</head>
+
+<body>
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container">
+      <a class="navbar-brand" href="#"><i class="fas fa-book"></i> Audiobook</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+        aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="Home.html"><i class="fas fa-home"></i> Home</a>
+          </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="categoriesDropdown" role="button" data-bs-toggle="dropdown"
+              aria-expanded="false">
+              <i class="fas fa-list"></i> Categories
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="categoriesDropdown" id="categoriesMenu">
+              <!-- Categories will be populated here dynamically -->
+            </ul>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="AllBook.html"><i class="fas fa-info-circle"></i> Book</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="ITS.html"><i class="fas fa-image"></i> ITS</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="TTS.html"><i class="fas fa-file-alt"></i> TTS</a>
+        </li>
+        </ul>
+        <!-- Search Form -->
+        <form class="d-flex ms-lg-3" id="searchForm">
+          <input class="form-control me-2" type="search" id="searchInput" placeholder="Search Audiobooks"
+            aria-label="Search">
+          <button class="btn btn-outline-light" type="submit"><i class="fas fa-search"></i></button>
+        </form>
+        <ul class="navbar-nav ms-lg-3">
+          <!-- Login/Logout Links -->
+          <li class="nav-item">
+            <a class="nav-link" href="#"><i class="fas fa-sign-in-alt"></i> Login</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#"><i class="fas fa-sign-out-alt"></i> Logout</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container mt-5" style="flex: 1;">
+    <h2 class="mb-4">Âm thanh của tôi</h2>
+    <i>Giới hạn sử dụng cho mỗi tài khoản là 5 audio.</i><br>
+    <i>Để hệ thống có thể sử dụng ổn định và cho ra chất lượng âm thanh tốt nhất, bạn cần tải lên file âm thanh có độ dài từ 3 - 10 phút, file không chứa tạp âm (tiếng gió, âm nhạc, tiếng ồn,...), chỉ có giọng đọc của 1 người duy nhất.</i><br>
+    <i>Định dạng file âm thanh hỗ trợ: mp3, wav, ogg.</i><br>
+    <i>Bạn có thể tham khảo file âm thanh mẫu dưới đây: </i>
+    <br>
+    <audio controls>
+      <source src="https://res.cloudinary.com/dr4h3g2af/video/upload/v1732859168/cwekaywulzve8lpngisi.wav" type="audio/mp3">
+    </audio>
+    <br>
+    <button class="btn btn-primary mb-3" onclick="addMyAudio()"><i class="fas fa-plus"></i> Thêm mới</button>
+    <table class="table table-hover table-striped table-bordered">
+      <thead class="table-dark">
+        <tr>
+          <th scope="col">STT</th>
+          <th scope="col">Tên Audio</th>
+          <th scope="col">Audio</th>
+          <th scope="col">Chức năng</th>
+        </tr>
+      </thead>
+      <tbody id="myAudioTableBody">
+        <!-- Rows will be populated here dynamically -->
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Modal for adding new audio -->
+  <div class="modal fade" id="addAudioModal" tabindex="-1" aria-labelledby="addAudioModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="addAudioModalLabel">Thêm âm thanh mới</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="addAudioForm">
+            <div class="mb-3">
+              <label for="audioName" class="form-label">Tên âm thanh</label>
+              <input type="text" class="form-control" id="audioName" placeholder="Nhập tên âm thanh" required>
+            </div>
+            <!-- Tabs for Upload and Record -->
+            <ul class="nav nav-tabs" id="audioTab" role="tablist">
+              <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="upload-tab" data-bs-toggle="tab" data-bs-target="#upload"
+                  type="button" role="tab" aria-controls="upload" aria-selected="true">Tải lên</button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button class="nav-link" id="record-tab" data-bs-toggle="tab" data-bs-target="#record" type="button"
+                  role="tab" aria-controls="record" aria-selected="false">Ghi âm</button>
+              </li>
+            </ul>
+            <div class="tab-content" id="audioTabContent">
+              <div class="tab-pane fade show active" id="upload" role="tabpanel" aria-labelledby="upload-tab">
+                <div class="mb-3">
+                  <label for="audioFile" class="form-label">Tải lên file âm thanh</label>
+                  <input type="file" class="form-control" id="audioFile" accept="audio/*" required>
+                </div>
+              </div>
+              <div class="tab-pane fade" id="record" role="tabpanel" aria-labelledby="record-tab">
+                <div class="mb-3">
+                  <button type="button" class="btn btn-danger" id="startRecording" style="margin: 10px;">Bắt đầu ghi
+                    âm</button>
+                  <button type="button" class="btn btn-secondary" id="stopRecording" disabled style="margin: 10px;">Dừng
+                    ghi âm</button>
+                  <audio id="audioPlayback" controls style="display: none;"></audio>
+                </div>
+              </div>
+            </div>
+            <div>
+              <i id="textProgressBar" style="display: none;">Đang tải thông tin, vui lòng chờ</i>
+              <div class="progress" id="addAudioProgress" style="display: none;">
+                <div class="progress-bar" role="progressbar" style="width: 100%;" aria-valuenow="100" aria-valuemin="0"
+                  aria-valuemax="100"></div>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+          <button type="button" class="btn btn-primary" onclick="submitAudio()">Thêm mới</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Modal for update audio -->
+  <div class="modal fade" id="updateAudio" tabindex="-1" aria-labelledby="updateAudioModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="updateAudioModalLabel">Cập nhật âm thanh</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="updateAudioForm">
+            <div class="mb-3">
+              <label for="audioNameUpdate" class="form-label">Tên âm thanh</label>
+              <input type="text" class="form-control" id="audioNameUpdate" placeholder="Nhập tên âm thanh" required>
+            </div>
+            <!-- Tabs for Upload and Record -->
+            <ul class="nav nav-tabs" id="audioTabUpdate" role="tablist">
+              <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="upload-tab-update" data-bs-toggle="tab"
+                  data-bs-target="#uploadUpdate" type="button" role="tab" aria-controls="uploadUpdate"
+                  aria-selected="true">Tải lên</button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button class="nav-link" id="record-tab-update" data-bs-toggle="tab" data-bs-target="#recordUpdate"
+                  type="button" role="tab" aria-controls="recordUpdate" aria-selected="false">Ghi âm</button>
+              </li>
+            </ul>
+            <div class="tab-content" id="audioTabContentUpdate">
+              <div class="tab-pane fade show active" id="uploadUpdate" role="tabpanel"
+                aria-labelledby="upload-tab-update">
+                <div class="mb-3">
+                  <label for="audioFileUpdate" class="form-label">Tải lên file âm thanh</label>
+                  <input type="file" class="form-control" id="audioFileUpdate" accept="audio/*">
+                </div>
+              </div>
+              <div class="tab-pane fade" id="recordUpdate" role="tabpanel" aria-labelledby="record-tab-update">
+                <div class="mb-3">
+                  <button type="button" class="btn btn-danger" id="startRecordingUpdate" style="margin: 10px;">Bắt đầu
+                    ghi âm</button>
+                  <button type="button" class="btn btn-secondary" id="stopRecordingUpdate" disabled
+                    style="margin: 10px;">Dừng ghi âm</button>
+                  <audio id="audioPlaybackUpdate" controls style="display: none;"></audio>
+                </div>
+              </div>
+            </div>
+            <div>
+              <i id="textProgressBarUpdate" style="display: none;">Đang tải thông tin, vui lòng chờ</i>
+              <div class="progress" id="updateAudioProgress" style="display: none;">
+                <div class="progress-bar" role="progressbar" style="width: 100%;" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+          <button type="button" class="btn btn-primary" onclick="submitUpdateAudio()">Cập nhật</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Delete Confirmation Modal -->
+  <div class="modal fade" id="deleteConfirmationModal" tabindex="-1" aria-labelledby="deleteConfirmationModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="deleteConfirmationModalLabel">Xác nhận xóa</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          Bạn có chắc chắn muốn xóa âm thanh này không?
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+          <button type="button" class="btn btn-danger" id="confirmDeleteButton">Xóa</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Footer -->
+  <footer class="bg-dark text-white py-4">
+    <div class="container text-center">
+      <p>&copy; 2024 Audiobook. All rights reserved.</p>
+      <div class="social-icons">
+        <a href="#"><i class="fab fa-facebook-f"></i></a>
+        <a href="#"><i class="fab fa-twitter"></i></a>
+        <a href="#"><i class="fab fa-instagram"></i></a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Bootstrap JS and Popper.js -->
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.7/dist/umd/popper.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.min.js"></script>
+  <!-- Custom JS -->
+  <script src="./JS/MyAudio.js"></script>
+</body>
+
+</html>

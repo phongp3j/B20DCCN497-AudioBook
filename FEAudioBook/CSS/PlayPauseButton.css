@@ -1,0 +1,49 @@
+.play-pause-btn {
+    width: 50px;
+    height: 50px;
+    background-color: #3B8686; /* Màu nền của nút */
+    border: none;
+    border-radius: 50%; /* Để tạo hình tròn */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    outline: none;
+    transition: background-color 0.3s; /* Hiệu ứng chuyển màu khi hover */
+}
+
+.play-pause-btn:hover {
+    background-color: #A8DBA8; /* Màu khi hover */
+}
+
+.play-icon {
+    width: 0;
+    height: 0;
+    border-left: 15px solid white; /* Hình tam giác cho nút Play */
+    border-top: 8px solid transparent;
+    border-bottom: 8px solid transparent;
+}
+
+.pause-icon {
+    width: 15px; /* Chiều rộng của hình vuông */
+    height: 15px; /* Chiều cao của hình vuông */
+    background-color: white; /* Màu cho hình vuông Pause */
+    margin: 0 5px; /* Khoảng cách giữa các hình vuông */
+    display: none; /* Ẩn hình vuông khi đang ở trạng thái Play */
+}
+
+.show-play .play-icon {
+    display: block; /* Hiện hình tam giác khi Play */
+}
+
+.show-play .pause-icon {
+    display: none; /* Ẩn hình vuông */
+}
+
+.show-pause .play-icon {
+    display: none; /* Ẩn hình tam giác khi Pause */
+}
+
+.show-pause .pause-icon {
+    display: block; /* Hiện hình vuông khi ở trạng thái Pause */
+}
