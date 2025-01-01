@@ -123,7 +123,7 @@ async function generateAudio() {
             `;
     playUserVoice(textInput, selectedVoice,selectedVoiceName);
 }
-
+const chapterId = 1;
 // Hàm để phát giọng người dùng và gửi dữ liệu đến API
 async function playUserVoice(text, audioFile,audioName) {
     try {
@@ -134,7 +134,7 @@ async function playUserVoice(text, audioFile,audioName) {
 
         // Gửi yêu cầu tới API bằng fetch
         const response = await fetch(
-            "https://86ee-34-125-88-118.ngrok-free.app/generate", // Thay api ở đây
+            "https://1594-34-142-147-129.ngrok-free.app/generate", // Thay api ở đây
             {
                 method: "POST",
                 body: formData,
@@ -147,62 +147,99 @@ async function playUserVoice(text, audioFile,audioName) {
             console.log("API Response:", data);
             // Cập nhật nội dung của audioPlayer
             audioPlayer.innerHTML = `
-                <h4>Now Playing:</h4>
-                <div id="waveform"></div>
-                <button id="playPauseBtn" class="play-pause-btn">
-                    <div class="play-icon"></div>
-                    <div class="pause-icon"></div>
-                </button>
-                <div id="time-display">00:00 / 00:00</div>
+                <h4>Giọng đọc: ${audioName}</h4>
+                <div id="waveform${chapterId}"></div>
+                <div class="audio-controls d-flex align-items-center justify-content-center gap-2 my-3">
+                    <!-- Nút Tua Lại -->
+                    <button id="seekBackwardBtn${chapterId}" class="btn btn-outline-primary">
+                        <i class="bi bi-skip-backward-fill"></i> -10s
+                    </button>
+                    <!-- Nút Play/Pause -->
+                    <button id="playPauseBtn${chapterId}" class="play-pause-btn">
+                        <div class="play-icon"></div>
+                        <div class="pause-icon"></div>
+                    </button>
+                    <!-- Nút Tua Tiến -->
+                    <button id="seekForwardBtn${chapterId}" class="btn btn-outline-primary">
+                        +10s <i class="bi bi-skip-forward-fill"></i>
+                    </button>
+                    <!-- Dropdown Tốc Độ -->
+                    <div class="d-flex align-items-center mx-2">
+                        <i class="bi bi-speedometer me-1"></i>
+                        <select id="speedSelect${chapterId}" class="form-select form-select-sm w-auto">
+                            <option value="0.5">0.5x</option>
+                            <option value="1" selected>1x</option>
+                            <option value="1.5">1.5x</option>
+                            <option value="2">2x</option>
+                        </select>
+                    </div>
+                </div>
+                <!-- Hiển thị thời gian -->
+                <div id="time-display${chapterId}" class="text-center mt-2 fw-bold">
+                    00:00 / 00:00
+                </div>
             `;
-            // Tạo WaveSurfer
-            const wavesurfer = WaveSurfer.create({
-                container: '#waveform', // Chọn phần tử HTML để hiển thị sóng âm
-                waveColor: '#A8DBA8',   // Màu của sóng âm
-                progressColor: '#3B8686', // Màu của sóng âm khi phát
-                barWidth: 2,            // Độ rộng của mỗi thanh sóng
-                height: 100,            // Chiều cao của waveform
-                responsive: true
-            });
-            // Tải file âm thanh từ URL vào WaveSurfer
-            wavesurfer.load(data.audio_file_url);
-            // Biến cờ để xác định play lần đầu
-            let isFirstPlay = true;
-            // Xử lý Play/Pause khi nhấn nút
-            document.getElementById('playPauseBtn').addEventListener("click", function () {
-                wavesurfer.playPause();
-                updatePlayPauseIcon();
-            });
-            // Cập nhật thời gian phát
-            wavesurfer.on('audioprocess', function () {
-                const currentTime = formatTime(wavesurfer.getCurrentTime());
-                const duration = formatTime(wavesurfer.getDuration());
-                document.getElementById('time-display').textContent = `${currentTime} / ${duration}`;
-            });
-            // Định dạng thời gian (MM:SS)
-            function formatTime(seconds) {
-                const minutes = Math.floor(seconds / 60);
-                const secs = Math.floor(seconds % 60);
-                return `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-            }
-            // Gọi hàm addHistory khi phát âm thanh lần đầu
-            wavesurfer.on('play', function () {
-                if (isFirstPlay) {
-                    addHistory(data.audio_file_url, audioName, "Văn bản", "Sinh âm thanh từ văn bản");
-                    isFirstPlay = false;
-                }
-            });
-            // Hàm cập nhật biểu tượng nút Play/Pause
-            function updatePlayPauseIcon() {
-                const playPauseBtn = document.getElementById("playPauseBtn");
-                if (wavesurfer.isPlaying()) {
-                    playPauseBtn.classList.remove('show-play');
-                    playPauseBtn.classList.add('show-pause');
-                } else {
-                    playPauseBtn.classList.remove('show-pause');
-                    playPauseBtn.classList.add('show-play');
-                }
-            }
+    // Khởi tạo Wavesurfer
+    const wavesurfer = WaveSurfer.create({
+        container: `#waveform${chapterId}`,
+        waveColor: '#A8DBA8',
+        progressColor: '#3B8686',
+        barWidth: 2,
+        height: 100,
+        responsive: true
+    });
+    // Tải file âm thanh từ URL
+    wavesurfer.load(data.audio_file_url);
+    // Biến cờ để xác định play lần đầu
+    let isFirstPlay = true;
+    // Lắng nghe sự kiện 'play' chỉ lần đầu tiên
+    wavesurfer.on('play', function () {
+        if (isFirstPlay) {
+            addHistory(audioFile, audioName, "Text to Speech", "Text to Speech");
+            isFirstPlay = false; // Đặt cờ để không chạy lại lần sau
+        }
+    });
+    // Xử lý tua lại 10 giây
+    document.getElementById(`seekBackwardBtn${chapterId}`).addEventListener("click", function () {
+        wavesurfer.seekTo((wavesurfer.getCurrentTime() - 10) / wavesurfer.getDuration());
+    });
+    // Xử lý tua tới 10 giây
+    document.getElementById(`seekForwardBtn${chapterId}`).addEventListener("click", function () {
+        wavesurfer.seekTo((wavesurfer.getCurrentTime() + 10) / wavesurfer.getDuration());
+    });
+    // Xử lý thay đổi tốc độ phát với select
+    document.getElementById(`speedSelect${chapterId}`).addEventListener("change", function () {
+        const newSpeed = parseFloat(this.value);
+        wavesurfer.setPlaybackRate(newSpeed);
+    });
+    // Xử lý play/pause với một nút tùy chỉnh
+    document.getElementById(`playPauseBtn${chapterId}`).addEventListener("click", function () {
+        wavesurfer.playPause();
+        updatePlayPauseIcon(); // Cập nhật biểu tượng nút play/pause
+    });
+    // Cập nhật thời gian phát
+    wavesurfer.on('audioprocess', function () {
+        const currentTime = formatTime(wavesurfer.getCurrentTime());
+        const duration = formatTime(wavesurfer.getDuration());
+        document.getElementById(`time-display${chapterId}`).textContent = `${currentTime} / ${duration}`;
+    });
+    // Định dạng thời gian (MM:SS)
+    function formatTime(seconds) {
+        const minutes = Math.floor(seconds / 60);
+        const secs = Math.floor(seconds % 60);
+        return `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    }
+    // Hàm cập nhật biểu tượng nút Play/Pause
+    function updatePlayPauseIcon() {
+        const playPauseBtn = document.getElementById(`playPauseBtn${chapterId}`);
+        if (wavesurfer.isPlaying()) {
+            playPauseBtn.classList.remove('show-play');
+            playPauseBtn.classList.add('show-pause');
+        } else {
+            playPauseBtn.classList.remove('show-pause');
+            playPauseBtn.classList.add('show-play');
+        }
+    }
         } else {
             console.error("Error with API request:", response.status);
             audioPlayer.innerHTML = `

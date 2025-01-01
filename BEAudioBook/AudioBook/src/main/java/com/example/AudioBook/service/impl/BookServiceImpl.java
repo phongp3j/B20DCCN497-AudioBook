@@ -281,7 +281,7 @@ public class BookServiceImpl implements BookService {
             x.setAuthor(b.getAuthor());
             x.setPublished(b.getPublished_at());
             x.setTitle(b.getTitle());
-            double rating = reviewRepository.findByBookId(b.getId()).stream().mapToDouble(Review::getRating).average().orElse(5.0);
+            double rating = Math.round(reviewRepository.findByBookId(b.getId()).stream().mapToDouble(Review::getRating).average().orElse(5.0) * 100.0) / 100.0;
             x.setRating(rating);
             res.add(x);
         }

@@ -464,7 +464,7 @@ const displayBooks = () => {
                      <button class="btn btn-primary btn-sm" onclick="viewBook(${book.id})">Xem</button>
                      <button class="btn btn-warning btn-sm" onclick="editBook(${book.id})">Sửa</button>
                      <button class="btn btn-danger btn-sm" onclick="deleteBook(${book.id})">Xóa</button>
-                     <button class="btn btn-primary  btn-sm" onclick="deleteBook(${book.id})">Quản lý đánh giá</button>
+                     <button class="btn btn-primary  btn-sm" onclick="reviewsOfBook(${book.id})">Quản lý đánh giá</button>
                  </td>
              </tr>
          `;
@@ -501,6 +501,13 @@ const editBook = (bookId) => {
     localStorage.setItem('bookIdToUpdateAdmin', bookId);
     // Điều hướng tới trang chi tiết sách
     window.location.href = 'UpdateBookAdmin.html';
+};
+// Hàm xem đánh giá sách
+const reviewsOfBook = (bookId) => {
+    // Lưu id sách vào localStorage
+    localStorage.setItem('bookIdToManagementReviewAdmin', bookId);
+    // Điều hướng tới trang chi tiết sách
+    window.location.href = 'ManagementReview.html';
 };
 ////////////////////////////////////////////////////////sinh audio///////////////////////////////////////////////
 document.getElementById('generateAudio').addEventListener('click', function () {
@@ -569,7 +576,7 @@ async function generateAudioAdmin(text, audioFile) {
             console.log("API Response:", data);
             // Cập nhật nội dung của audioPlayer
             const audioUrlReceive = document.getElementById("audioUrlReceive");
-            audioUrlReceive.innerHTML = "Link tải file Audio: "+  data.audio_file_url;
+            audioUrlReceive.innerHTML = "Link tải file Audio: " + data.audio_file_url;
             audioPlayer.innerHTML = `
                 <h4>Now Playing:</h4>
                 <div id="waveform"></div>
@@ -664,4 +671,133 @@ async function uploadAudio(file) {
     // Trả về đường dẫn của audio
     const audioUrl = await response.text();
     return audioUrl;
+}
+
+///////////////////////////////////////////////////Thống kê///////////////////////////////////////////////
+document.getElementById('statisticalReview').addEventListener('click', function () {
+    // Ẩn nội dung chính
+    if (selectedContent === "") {
+        document.getElementById('mainContent').classList.add('d-none');
+        document.getElementById('statisticReviewForm').classList.remove('d-none');
+        selectedContent = "statisticReviewForm";
+    }
+    else {
+        document.getElementById(selectedContent).classList.add('d-none');
+        // Hiện bảng người dùng
+        document.getElementById('statisticReviewForm').classList.remove('d-none');
+        selectedContent = "statisticReviewForm";
+    }
+    // Cập nhật menu hiện tại
+    fetchBooksStat();
+    updateActiveMenu('statisticalReview');
+});
+async function fetchChartData() {
+    try {
+        const response = await fetch('http://localhost:8080/statReviews');
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Error fetching chart data:', error);
+        return null;
+    }
+}
+
+async function renderChart() {
+    const chartData = await fetchChartData();
+    if (!chartData) return;
+
+    const pieCtx = document.getElementById('pieChart').getContext('2d');
+    const pieChart = new Chart(pieCtx, {
+        type: 'pie',
+        data: {
+            labels: ['5 sao', '4 sao', '3 sao', '2 sao', '1 sao'],
+            datasets: [{
+                data: [
+                    chartData['5s'] * 100,
+                    chartData['4s'] * 100,
+                    chartData['3s'] * 100,
+                    chartData['2s'] * 100,
+                    chartData['1s'] * 100
+                ],
+                backgroundColor: ['#0d6efd', '#e9ecef', '#ffc107', '#dc3545', '#6c757d'],
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                datalabels: {
+                    formatter: (value, context) => {
+                        return value.toFixed(1) + '%';
+                    },
+                    color: '#fff',
+                    font: {
+                        weight: 'bold'
+                    }
+                }
+            }
+        },
+        plugins: [ChartDataLabels]
+    });
+}
+
+document.addEventListener('DOMContentLoaded', renderChart);
+var booksStat = [];
+var filteredBooksStat = [];
+// Hàm lấy dữ liệu sách từ API
+const fetchBooksStat = async () => {
+    try {
+        const response = await fetch('http://localhost:8080/book/0/0');
+        booksStat = await response.json();
+        displayBooksStat(); // Gọi hàm để hiển thị danh sách sách sau khi fetch
+    } catch (error) {
+        alert('Không thể tải dữ liệu sách.');
+    }
+};
+/// Hàm hiển thị sách
+const displayBooksStat = () => {
+    const bookTableBody = document.getElementById('bookTableStatBody');
+    bookTableBody.innerHTML = ''; // Xóa nội dung cũ
+    const booksToDisplay = filteredBooksStat.length > 0 ? filteredBooksStat : books; // Nếu không có kết quả lọc, hiển thị tất cả sách
+    // Kiểm tra nếu không có sách nào để hiển thị
+    if (booksToDisplay.length === 0) {
+        alert('Không có dữ liệu'); // Hiển thị cảnh báo
+        return; // Kết thúc hàm
+    }
+    // Hiển thị sách
+    booksToDisplay.forEach(book => {
+        const rowHTML = `
+             <tr>
+                 <td>${book.id}</td>
+                 <td><img src="${book.image}" alt="Book Cover" style="width: 100px; height: auto;"></td>
+                 <td>${book.title}</td>
+                 <td>${book.category}</td>
+                 <td>${book.author}</td>
+                 <td>
+                     <button class="btn btn-warning  btn-sm" onclick="statReviewsOfBook(${book.id})">Xem Thống Kê</button>
+                 </td>
+             </tr>
+         `;
+        bookTableBody.insertAdjacentHTML('beforeend', rowHTML);
+    });
+};
+// Tìm kiếm sách
+const searchBooksStat = () => {
+    const searchTerm = document.getElementById('bookSearchInputStat').value.toLowerCase();
+    filteredBooksStat = booksStat.filter(book =>
+        book.title.toLowerCase().includes(searchTerm)
+    );
+    console.log(filteredBooksStat);
+    displayBooksStat(); // Gọi hàm để hiển thị danh sách sách đã lọc
+};
+// Bắt sự kiện khi nhấn nút tìm kiếm
+document.getElementById('bookSearchButtonStat').addEventListener('click', searchBooksStat);
+// Bắt sự kiện khi người dùng nhập vào ô tìm kiếm (tự động tìm kiếm)
+document.getElementById('bookSearchInputStat').addEventListener('input', searchBooksStat);
+
+function statReviewsOfBook(bookId) {
+    // Lưu id sách vào localStorage
+    localStorage.setItem('bookIdToStatReviewAdmin', bookId);
+    // Điều hướng tới trang chi tiết sách
+    window.location.href = 'StatisticalReview.html';
 }

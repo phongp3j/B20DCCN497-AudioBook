@@ -13,44 +13,57 @@ async function fetchBookDetails() {
         document.getElementById("bookImage").src = book.image;
         document.getElementById("bookImage").style.width = "400px";
         document.getElementById("bookImage").style.height = "500px";
-
+        document.getElementById("bookAuthor").textContent = book.author;
+        document.getElementById("bookCategory").textContent = book.category;
+        document.getElementById("bookPublished").textContent = book.published;
         if (book.listChapter && book.listChapter.length > 0) {
             const chapterList = document.getElementById("chapterList");
             chapterList.innerHTML = "";
-
             book.listChapter.forEach((chapter) => {
                 let chapterHTML = `
-                        <div class="chapter">
-                            <h3>${chapter.title_chapter}</h3>
-                            <div class="dropdown">
-                                <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    Chọn giọng có sẵn
-                                </button>
-                                <ul class="dropdown-menu" >
-                                    ${chapter.listAudio
+                        <div class="chapter p-3 mb-4 border rounded bg-light shadow-sm">
+    <!-- Tiêu đề chương -->
+    <h3 class="fw-bold mb-3 text-primary">${chapter.title_chapter}</h3>
+    
+    <!-- Dropdown: Chọn giọng có sẵn -->
+    <div class="dropdown mb-2">
+        <button class="btn btn-outline-primary dropdown-toggle w-100 text-start" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="bi bi-mic"></i> Chọn giọng có sẵn
+        </button>
+        <ul class="dropdown-menu w-100">
+            ${chapter.listAudio
                         .map(
                             (audio) => `
-                                        <li><a class="dropdown-item" href="#" onclick="displayAudio('${audio.audio_file}','${audio.audio_name}',${chapter.id},'${chapter.title_chapter}','${book.title}')">${audio.audio_name}</a></li>
-                                    `
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center" href="#" onclick="displayAudio('${audio.audio_file}','${audio.audio_name}',${chapter.id},'${chapter.title_chapter}','${book.title}')">
+                                <i class="bi bi-volume-up me-2"></i> ${audio.audio_name}
+                            </a>
+                        </li>
+                    `
                         )
                         .join("")}
-                                </ul>
-                            </div>
-                            <div class="dropdown mt-2">
-<button class="btn btn-secondary dropdown-toggle" type="button" id="userVoicesBtn${chapter.id
-                    }" data-bs-toggle="dropdown"
- aria-expanded="false" onclick="fetchUserVoices(${chapter.id},'${chapter.text}','${chapter.title_chapter}','${book.title}')">
-    Sử dụng giọng của bạn
-</button>
-<ul class="dropdown-menu" id="userVoicesDropdown${chapter.id}">
-    <!-- Placeholder for user voices -->
-    <li><a class="dropdown-item" href="#">No user voices available</a></li>
-</ul>
+        </ul>
+    </div>
+
+    <!-- Dropdown: Sử dụng giọng của bạn -->
+    <div class="dropdown mb-2">
+        <button class="btn btn-outline-secondary dropdown-toggle w-100 text-start" type="button" id="userVoicesBtn${chapter.id}"
+            data-bs-toggle="dropdown" aria-expanded="false"
+            onclick="fetchUserVoices(${chapter.id},'${chapter.text}','${chapter.title_chapter}','${book.title}')">
+            <i class="bi bi-person-voice"></i> Sử dụng giọng của bạn
+        </button>
+        <ul class="dropdown-menu w-100" id="userVoicesDropdown${chapter.id}">
+            <!-- Placeholder for user voices -->
+            <li><a class="dropdown-item" href="#">No user voices available</a></li>
+        </ul>
+    </div>
+
+    <!-- Trình phát Audio -->
+    <div id="audioPlayer${chapter.id}" class="mt-4 p-3 border rounded bg-white shadow-sm">
+        <div class="text-center text-muted">Chưa có audio nào được chọn.</div>
+    </div>
 </div>
 
-                            <div id="audioPlayer${chapter.id
-                    }" class="mt-3"></div>
-                        </div>
                     `;
                 chapterList.innerHTML += chapterHTML;
             });
@@ -65,14 +78,39 @@ async function fetchBookDetails() {
 
 function displayAudio(audioFile, audioName, chapterId, chapterTitle, bookTitle) {
     const audioPlayer = document.getElementById(`audioPlayer${chapterId}`);
+        // Cập nhật nội dung của audioPlayer
     audioPlayer.innerHTML = `
         <h4>Giọng đọc: ${audioName}</h4>
         <div id="waveform${chapterId}"></div>
-        <button id="playPauseBtn${chapterId}" class="play-pause-btn">
-            <div class="play-icon"></div>
-            <div class="pause-icon"></div>
-        </button>
-        <div id="time-display${chapterId}">00:00 / 00:00</div>
+        <div class="audio-controls d-flex align-items-center justify-content-center gap-2 my-3">
+            <!-- Nút Tua Lại -->
+            <button id="seekBackwardBtn${chapterId}" class="btn btn-outline-primary">
+                <i class="bi bi-skip-backward-fill"></i> -10s
+            </button>
+            <!-- Nút Play/Pause -->
+            <button id="playPauseBtn${chapterId}" class="play-pause-btn">
+                <div class="play-icon"></div>
+                <div class="pause-icon"></div>
+            </button>
+            <!-- Nút Tua Tiến -->
+            <button id="seekForwardBtn${chapterId}" class="btn btn-outline-primary">
+                +10s <i class="bi bi-skip-forward-fill"></i>
+            </button>
+            <!-- Dropdown Tốc Độ -->
+            <div class="d-flex align-items-center mx-2">
+                <i class="bi bi-speedometer me-1"></i>
+                <select id="speedSelect${chapterId}" class="form-select form-select-sm w-auto">
+                    <option value="0.5">0.5x</option>
+                    <option value="1" selected>1x</option>
+                    <option value="1.5">1.5x</option>
+                    <option value="2">2x</option>
+                </select>
+            </div>
+        </div>
+        <!-- Hiển thị thời gian -->
+        <div id="time-display${chapterId}" class="text-center mt-2 fw-bold">
+            00:00 / 00:00
+        </div>
     `;
     // Khởi tạo Wavesurfer
     const wavesurfer = WaveSurfer.create({
@@ -93,6 +131,19 @@ function displayAudio(audioFile, audioName, chapterId, chapterTitle, bookTitle) 
             addHistory(audioFile, audioName, chapterTitle, bookTitle);
             isFirstPlay = false; // Đặt cờ để không chạy lại lần sau
         }
+    });
+    // Xử lý tua lại 10 giây
+    document.getElementById(`seekBackwardBtn${chapterId}`).addEventListener("click", function () {
+        wavesurfer.seekTo((wavesurfer.getCurrentTime() - 10) / wavesurfer.getDuration());
+    });
+    // Xử lý tua tới 10 giây
+    document.getElementById(`seekForwardBtn${chapterId}`).addEventListener("click", function () {
+        wavesurfer.seekTo((wavesurfer.getCurrentTime() + 10) / wavesurfer.getDuration());
+    });
+    // Xử lý thay đổi tốc độ phát với select
+    document.getElementById(`speedSelect${chapterId}`).addEventListener("change", function () {
+        const newSpeed = parseFloat(this.value);
+        wavesurfer.setPlaybackRate(newSpeed);
     });
     // Xử lý play/pause với một nút tùy chỉnh
     document.getElementById(`playPauseBtn${chapterId}`).addEventListener("click", function () {
@@ -218,7 +269,7 @@ async function playUserVoice(audioFile, audioName, chapterId, chapterText, chapt
 
         // Gửi yêu cầu tới API bằng fetch
         const response = await fetch(
-            "https://94ee-34-125-170-7.ngrok-free.app/generate", // Thay api ở đây
+            "https://1594-34-142-147-129.ngrok-free.app/generate", // Thay api ở đây
             {
                 method: "POST",
                 body: formData,
@@ -232,33 +283,77 @@ async function playUserVoice(audioFile, audioName, chapterId, chapterText, chapt
             console.log("API Response:", data);
 
 
-            // Cập nhật nội dung của audioPlayer
+             // Cập nhật nội dung của audioPlayer
             audioPlayer.innerHTML = `
-                <h4>Now Playing: ${audioName}</h4>
+                <h4>Giọng đọc: ${audioName}</h4>
                 <div id="waveform${chapterId}"></div>
-                <button id="playPauseBtn${chapterId}" class="play-pause-btn">
-                    <div class="play-icon"></div>
-                    <div class="pause-icon"></div>
-                </button>
-                <div id="time-display${chapterId}">00:00 / 00:00</div>
+                <div class="audio-controls d-flex align-items-center justify-content-center gap-2 my-3">
+                    <!-- Nút Tua Lại -->
+                    <button id="seekBackwardBtn${chapterId}" class="btn btn-outline-primary">
+                        <i class="bi bi-skip-backward-fill"></i> -10s
+                    </button>
+                    <!-- Nút Play/Pause -->
+                    <button id="playPauseBtn${chapterId}" class="play-pause-btn">
+                        <div class="play-icon"></div>
+                        <div class="pause-icon"></div>
+                    </button>
+                    <!-- Nút Tua Tiến -->
+                    <button id="seekForwardBtn${chapterId}" class="btn btn-outline-primary">
+                        +10s <i class="bi bi-skip-forward-fill"></i>
+                    </button>
+                    <!-- Dropdown Tốc Độ -->
+                    <div class="d-flex align-items-center mx-2">
+                        <i class="bi bi-speedometer me-1"></i>
+                        <select id="speedSelect${chapterId}" class="form-select form-select-sm w-auto">
+                            <option value="0.5">0.5x</option>
+                            <option value="1" selected>1x</option>
+                            <option value="1.5">1.5x</option>
+                            <option value="2">2x</option>
+                        </select>
+                    </div>
+                </div>
+                <!-- Hiển thị thời gian -->
+                <div id="time-display${chapterId}" class="text-center mt-2 fw-bold">
+                    00:00 / 00:00
+                </div>
             `;
-            // Tạo WaveSurfer
+            // Khởi tạo Wavesurfer
             const wavesurfer = WaveSurfer.create({
-                container: `#waveform${chapterId}`, // Chọn phần tử HTML để hiển thị sóng âm
-                waveColor: '#A8DBA8',   // Màu của sóng âm
-                progressColor: '#3B8686', // Màu của sóng âm khi phát
-                barWidth: 2,            // Độ rộng của mỗi thanh sóng
-                height: 100,            // Chiều cao của waveform
+                container: `#waveform${chapterId}`,
+                waveColor: '#A8DBA8',
+                progressColor: '#3B8686',
+                barWidth: 2,
+                height: 100,
                 responsive: true
             });
-            // Tải file âm thanh từ URL vào WaveSurfer
+            // Tải file âm thanh từ URL
             wavesurfer.load(data.audio_file_url);
             // Biến cờ để xác định play lần đầu
             let isFirstPlay = true;
-            // Xử lý Play/Pause khi nhấn nút
+            // Lắng nghe sự kiện 'play' chỉ lần đầu tiên
+            wavesurfer.on('play', function () {
+                if (isFirstPlay) {
+                    addHistory(audioFile, audioName, chapterTitle, bookTitle);
+                    isFirstPlay = false; // Đặt cờ để không chạy lại lần sau
+                }
+            });
+            // Xử lý tua lại 10 giây
+            document.getElementById(`seekBackwardBtn${chapterId}`).addEventListener("click", function () {
+                wavesurfer.seekTo((wavesurfer.getCurrentTime() - 10) / wavesurfer.getDuration());
+            });
+            // Xử lý tua tới 10 giây
+            document.getElementById(`seekForwardBtn${chapterId}`).addEventListener("click", function () {
+                wavesurfer.seekTo((wavesurfer.getCurrentTime() + 10) / wavesurfer.getDuration());
+            });
+            // Xử lý thay đổi tốc độ phát với select
+            document.getElementById(`speedSelect${chapterId}`).addEventListener("change", function () {
+                const newSpeed = parseFloat(this.value);
+                wavesurfer.setPlaybackRate(newSpeed);
+            });
+            // Xử lý play/pause với một nút tùy chỉnh
             document.getElementById(`playPauseBtn${chapterId}`).addEventListener("click", function () {
                 wavesurfer.playPause();
-                updatePlayPauseIcon(chapterId);
+                updatePlayPauseIcon(); // Cập nhật biểu tượng nút play/pause
             });
             // Cập nhật thời gian phát
             wavesurfer.on('audioprocess', function () {
@@ -272,15 +367,8 @@ async function playUserVoice(audioFile, audioName, chapterId, chapterText, chapt
                 const secs = Math.floor(seconds % 60);
                 return `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
             }
-            // Gọi hàm addHistory khi phát âm thanh lần đầu
-            wavesurfer.on('play', function () {
-                if (isFirstPlay) {
-                    addHistory(data.audio_file_url, audioName, chapterTitle, bookTitle);
-                    isFirstPlay = false;
-                }
-            });
             // Hàm cập nhật biểu tượng nút Play/Pause
-            function updatePlayPauseIcon(chapterId) {
+            function updatePlayPauseIcon() {
                 const playPauseBtn = document.getElementById(`playPauseBtn${chapterId}`);
                 if (wavesurfer.isPlaying()) {
                     playPauseBtn.classList.remove('show-play');

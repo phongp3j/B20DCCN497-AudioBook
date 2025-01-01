@@ -25,7 +25,7 @@
     </div>
   </header>
 
-  <!-- Main Content Area -->
+  <!-- Main Content Chung -->
   <div class="container-fluid">
     <!-- Sidebar -->
     <div class="sidebar">
@@ -36,7 +36,7 @@
       <a href="#" id="statisticalReview"><i class="fas fa-chart-bar"></i> Thống kê đánh giá</a>
     </div>
 
-    <!-- Main Content -->
+    <!-- Main Content từng sidebar -->
     <div class="content">
       <h2>Chào mừng đến trang quản lý</h2>
       <div id="mainContent">
@@ -314,16 +314,67 @@
           <div id="audioPlayer" class="mt-3"></div>
         </div>
       </div>
+
+      <!-- Modal thống kê -->
+      <div id="statisticReviewForm" class="d-none">
+        <div class="row">
+          <!-- Phần cho biểu đồ tròn -->
+          <div class="col-md-5">
+            <h3>Tổng quan toàn hệ thống</h3>
+            <div style="width: 350px; height: 350px;">
+              <canvas id="pieChart"></canvas>
+            </div>
+          </div>
+          <!-- Phần tìm kiếm sách -->
+          <div class="col-md-7">
+            <h3>Thống kê theo từng đầu sách</h3>
+            <div class="input-group mb-3">
+              <input type="text" id="bookSearchInputStat" class="form-control" placeholder="Tìm kiếm sách...">
+              <button class="btn btn-outline-secondary" type="button" id="bookSearchButtonStat"
+                style="margin-left: 10px; background-color: #1ABC9C; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; transition: background-color 0.3s ease;"
+                onmouseover="this.style.backgroundColor='#16A085'" onmouseout="this.style.backgroundColor='#1ABC9C'">Tìm
+                kiếm</button>
+            </div>
+            <table class="table table-bordered table-striped">
+              <thead class="table-dark">
+                <tr>
+                  <th>ID</th>
+                  <th>Ảnh bìa</th>
+                  <th>Tên sách</th>
+                  <th>Danh mục</th>
+                  <th>Tác giả</th>
+                  <th>Thao tác</th>
+                </tr>
+              </thead>
+              <tbody id="bookTableStatBody">
+              </tbody>
+            </table>
+            <!-- <nav aria-label="Page navigation">
+              <ul class="pagination justify-content-center">
+                <li class="page-item" id="bookPrevPage"><a class="page-link" href="#">Trước</a></li>
+                <li class="page-item disabled" id="bookPageInfo"><a class="page-link" href="#">Trang 1 / 1</a></li>
+                <li class="page-item" id="bookNextPage"><a class="page-link" href="#">Tiếp theo</a></li>
+              </ul>
+            </nav> -->
+          </div>
+        </div>
+      </div>
     </div>
-  </div>
-  <!-- Footer -->
-  <footer>
-    <p>&copy; 2024 Admin Dashboard. All rights reserved.</p>
-  </footer>
-  <!-- Link Bootstrap JS, Popper.js và custom JS -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="https://unpkg.com/wavesurfer.js"></script>
-  <script src="./JS/Admin.js"></script>
+    </div>
+    <!-- Footer -->
+    <footer>
+      <p>&copy; 2024 Admin Dashboard. All rights reserved.</p>
+    </footer>
+    <!-- Link Bootstrap JS, Popper.js và custom JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/wavesurfer.js"></script>
+    <script src="./JS/Admin.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+    <script>
+      
+
+    </script>
 </body>
 
 </html>

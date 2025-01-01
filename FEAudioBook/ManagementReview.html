@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Management Review</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f5f5f5;
+        }
+
+        .book-container {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+
+        .book-image {
+            max-width: 100%;
+            border-radius: 5px;
+        }
+
+        .book-details h1 {
+            font-size: 2rem;
+            color: #333;
+        }
+
+        .back-button {
+            display: inline-block;
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+            padding: 10px 20px;
+        }
+
+        .review-container {
+            margin-top: 20px;
+        }
+
+        .review-card {
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 15px;
+            background-color: #f9f9f9;
+        }
+
+        .review-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .review-username {
+            font-weight: bold;
+        }
+
+        .review-rating {
+            color: #ffc107;
+        }
+
+        .review-text {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container py-5">
+        <!-- Nút Quay Lại -->
+        <button id="backButton" class="btn btn-secondary mb-3 back-button">
+            <i class="fas fa-arrow-left"></i> Quay lại
+        </button>
+
+        <!-- Thông tin chi tiết sách -->
+        <div class="row book-container">
+            <div class="col-md-4">
+                <img id="bookImage" src="" class="img-fluid book-image" alt="Book cover">
+            </div>
+            <div class="col-md-8 book-details">
+                <h1 id="bookTitle"></h1>
+                <p><strong>Tác giả:</strong> <span id="bookAuthor"></span></p>
+                <p><strong>Thể loại:</strong> <span id="bookCategory"></span></p>
+                <p><strong>Mô tả:</strong> <span id="bookDescription"></span></p>
+                <p><strong>Ngày phát hành:</strong> <span id="bookPublished"></span></p>
+            </div>
+        </div>
+        <div>
+            <br>
+            <h2>Tất cả đánh giá</h2>
+            <div id="reviews" class="review-container"></div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS and Popper.js -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.7/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.min.js"></script>
+
+    <!-- Custom Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const bookId = localStorage.getItem('bookIdToManagementReviewAdmin'); // Lấy ID sách từ localStorage
+            console.log(bookId);
+            if (bookId) {
+                try {
+                    const response = await fetch(`http://localhost:8080/book/${bookId}`);
+                    const book = await response.json();
+                    // Cập nhật thông tin sách
+                    document.getElementById('bookTitle').innerText = book.title;
+                    document.getElementById('bookAuthor').innerText = book.author;
+                    document.getElementById('bookCategory').innerText = book.category;
+                    document.getElementById('bookDescription').innerText = book.description;
+                    document.getElementById('bookPublished').innerText = book.published;
+                    document.getElementById('bookImage').src = book.image;
+                    try {
+                        const reviewResponse = await fetch(`http://localhost:8080/${bookId}/reviews`);
+                        const reviews = await reviewResponse.json();
+                        console.log(reviews);
+                        if (Array.isArray(reviews)) {
+                            const reviewsContainer = document.getElementById("reviews");
+                            reviewsContainer.innerHTML = "";
+                            reviews.forEach((review) => {
+                                const reviewCard = document.createElement("div");
+                                reviewCard.className = "review-card";
+                                reviewCard.innerHTML = `
+                                    <div class="review-header">
+                                    <span class="review-username">${review.user.username
+                                    }</span>
+                                    <span class="review-rating">${"★".repeat(
+                                        review.rating
+                                    )}</span>
+                                </div>
+                                <div class="review-text">${review.review}</div>
+                                <br>
+                                <button class="btn btn-danger btn-sm" onclick="deleteReview(${review.id})">Xóa</button>
+                            `;
+                                reviewsContainer.appendChild(reviewCard);
+                            });
+                        } else {
+                            console.error("Expected an array of reviews");
+                        }
+                    }
+                    catch (error) {
+                        alert('Không thể tải thông tin sách');
+                    }
+                } catch (error) {
+                    alert('Không thể tải thông tin sách');
+                }
+            } else {
+                alert('Chưa chọn sách nào');
+            }
+        });
+
+        // Xử lý nút quay lại
+        document.getElementById('backButton').addEventListener('click', () => {
+            localStorage.removeItem('bookIdToManagementReviewAdmin'); // Xóa ID sách khỏi localStorage
+            window.history.back(); // Quay lại trang trước đó
+        });
+        async function deleteReview(reviewId) {
+            const confirmDelete = confirm('Bạn có chắc chắn muốn xóa đánh giá này không?');
+            if (confirmDelete) {
+                try {
+                    const response = await fetch(`http://localhost:8080/reviews/${reviewId}`, {
+                        method: 'DELETE'
+                    });
+                    if (response.ok) {
+                        alert('Xóa đánh giá thành công');
+                        window.location.reload();
+                    } else {
+                        alert('Xóa đánh giá thất bại');
+                    }
+                } catch (error) {
+                    alert('Xóa đánh giá thất bại');
+                }
+            }
+        }
+    </script>
+</body>
+
+</html>

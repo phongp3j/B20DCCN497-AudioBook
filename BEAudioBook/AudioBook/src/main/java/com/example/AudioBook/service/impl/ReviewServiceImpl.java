@@ -1,6 +1,7 @@
 package com.example.AudioBook.service.impl;
 
 import com.example.AudioBook.DTO.Review.ReviewRequest;
+import com.example.AudioBook.DTO.Review.ReviewStat;
 import com.example.AudioBook.entity.Book;
 import com.example.AudioBook.entity.Review;
 import com.example.AudioBook.entity.User;
@@ -35,5 +36,71 @@ public class ReviewServiceImpl implements ReviewService {
         review.setUser(user);
         review.setBook(book);
         return reviewRepository.save(review);
+    }
+
+    @Override
+    public String deleteReview(Long id) {
+        reviewRepository.deleteById(id);
+        return "ok";
+    }
+
+    @Override
+    public ReviewStat getStatReviews() {
+        ReviewStat reviewStat =  new ReviewStat();
+        List<Review> reviews = reviewRepository.findAll();
+        float s5 = 0;
+        float s4 = 0;
+        float s3 = 0;
+        float s2 = 0;
+        float s1 = 0;
+        for (Review review : reviews) {
+            if (review.getRating() == 5) {
+                s5++;
+            } else if (review.getRating() == 4) {
+                s4++;
+            } else if (review.getRating() == 3) {
+                s3++;
+            } else if (review.getRating() == 2) {
+                s2++;
+            } else if (review.getRating() == 1) {
+                s1++;
+            }
+        }
+        reviewStat.setS5(s5/reviews.size());
+        reviewStat.setS4(s4/reviews.size());
+        reviewStat.setS3(s3/reviews.size());
+        reviewStat.setS2(s2/reviews.size());
+        reviewStat.setS1(s1/reviews.size());
+        return reviewStat;
+    }
+
+    @Override
+    public ReviewStat getStatReviewOfBook(Long bookId) {
+        ReviewStat reviewStat =  new ReviewStat();
+        List<Review> reviews = reviewRepository.findByBookId(bookId);
+        float s5 = 0;
+        float s4 = 0;
+        float s3 = 0;
+        float s2 = 0;
+        float s1 = 0;
+        for (Review review : reviews) {
+            if (review.getRating() == 5) {
+                s5++;
+            } else if (review.getRating() == 4) {
+                s4++;
+            } else if (review.getRating() == 3) {
+                s3++;
+            } else if (review.getRating() == 2) {
+                s2++;
+            } else if (review.getRating() == 1) {
+                s1++;
+            }
+        }
+        reviewStat.setS5(s5/reviews.size());
+        reviewStat.setS4(s4/reviews.size());
+        reviewStat.setS3(s3/reviews.size());
+        reviewStat.setS2(s2/reviews.size());
+        reviewStat.setS1(s1/reviews.size());
+        return reviewStat;
     }
 }

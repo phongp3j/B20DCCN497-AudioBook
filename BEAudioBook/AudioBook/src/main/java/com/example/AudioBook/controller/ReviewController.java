@@ -28,4 +28,21 @@ public class ReviewController {
         reviewRequest.setBook_id(bookId);
         return reviewService.addReview(reviewRequest);
     }
+
+    @DeleteMapping("reviews/{id}")
+    public ResponseEntity<?> deleteReview(@PathVariable Long id){
+        return ResponseEntity.ok(reviewService.deleteReview(id));
+    }
+
+    @GetMapping("/statReviews")
+    public ResponseEntity<?> getStatReviews(){
+        return ResponseEntity.ok(reviewService.getStatReviews());
+    }
+
+    @GetMapping("/statReviewOfBook/{bookId}")
+    public ResponseEntity<?> getStatReviewOfBook(@PathVariable Long bookId){
+        return ResponseEntity.ok(reviewService.getStatReviewOfBook(bookId));
+    }
+
+    
 }
