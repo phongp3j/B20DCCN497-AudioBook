@@ -32,7 +32,7 @@
             <i class="fas fa-list"></i> Categories
           </a>
           <ul class="dropdown-menu" aria-labelledby="categoriesDropdown" id="categoriesMenu">
-            <!-- Categories will be populated here dynamically -->
+            <!-- Categories hiện thị ở đây -->
           </ul>
         </li>
         <li class="nav-item">
@@ -60,7 +60,7 @@
 
 <div class="container-fluid mt-4" style="flex: 1;">
   <div class="row">
-      <!-- Sidebar for filters -->
+      <!-- Sidebar filters -->
       <div class="col-md-2">
           <h5>Bộ lọc</h5>
           <form id="filterForm">
@@ -68,7 +68,6 @@
                   <label for="categoryFilter" class="form-label">Thể loại</label>
                   <select class="form-select" id="categoryFilter">
                       <option value="0">Tất cả</option>
-                      <!-- Categories will be populated here dynamically -->
                   </select>
               </div>
               <div class="mb-3">
@@ -86,11 +85,10 @@
           </form>
       </div>
 
-      <!-- List of books -->
+      <!-- List books -->
       <div class="col-md-10">
           <h2 id="sizeBook" class="text-center"></h2>
           <div class="row" id="bookList">
-              <!-- Books will be populated here dynamically -->
           </div>
           <nav>
               <ul class="pagination justify-content-center" id="pagination"></ul>

@@ -4,7 +4,6 @@ async function fetchFeaturedBooks() {
         const response = await fetch('http://localhost:8080/featuredBook');
         const data = await response.json();
         const featuredBooksContainer = document.getElementById('featuredBooks');
-        // Dynamically create the HTML for each book
         data.forEach(book => {
             const bookCard = `
                 <div class="col-md-4 mb-4 d-flex align-items-stretch">
@@ -34,7 +33,6 @@ async function fetchFeaturedBooks() {
                     </div>
                 </div>
             `;
-            // Append each book card to the container
             featuredBooksContainer.innerHTML += bookCard;
         });
     } catch (error) {
@@ -60,16 +58,17 @@ async function fetchCategories() {
         console.error("Error fetching categories:", error);
     }
 }
-function bookInCategory(categoryId) {
+const bookInCategory = (categoryId) => {
     localStorage.setItem("selectedCategoryId", categoryId);
     window.location.href = "BookInCategory.html";
-}
-function listenNow(bookId) {
-    // Save the book ID in localStorage
+};
+
+const listenNow = (bookId) => {
+    //lưu lại book id 
     localStorage.setItem('selectedBookIdToListen', bookId);
-    // Redirect to the listening page
+    // chuyển trang
     window.location.href = 'ListenAudioBook.html';
-}
+};
 document.addEventListener("DOMContentLoaded", function () {
     // Lấy dữ liệu user từ localStorage
     const userData = JSON.parse(localStorage.getItem('userData'));

@@ -72,6 +72,43 @@
         .speed-select:hover {
             background-color: #16A085;
         }
+        .alert-box {
+            background: #fff3cd;
+            border: 1px solid #ffeeba;
+            color: #856404;
+            padding: 20px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .alert-box h2 {
+            margin-top: 0;
+            font-size: 1.5em;
+            text-align: center;
+        }
+        .alert-box p {
+            margin: 10px 0;
+            font-size: 1em;
+        }
+        .alert-box ul {
+            margin: 10px 0;
+            padding-left: 0;
+            list-style-type: none;
+        }
+        .alert-box li {
+            margin-bottom: 8px;
+        }
+        .alert-icon {
+            text-align: center;
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+        .alert-footer {
+            text-align: center;
+            margin-top: 15px;
+            font-weight: bold;
+        }
     </style>
 </head>
 
@@ -96,7 +133,7 @@
                             <i class="fas fa-list"></i> Categories
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="categoriesDropdown" id="categoriesMenu">
-                            <!-- Categories will be populated here dynamically -->
+                            <!-- Categories hiện thị ở đây -->
                         </ul>
                     </li>
                     <li class="nav-item">
@@ -130,6 +167,14 @@
 
     <div class="container mt-5" style="flex: 1;">
         <h3 class="text-center"><i class="fas fa-image"></i> Sinh âm thanh từ hình ảnh theo giọng đọc tùy chọn</h3>
+        <p><i>Việc sử dụng chức năng sinh âm thanh từ giọng đọc mẫu và hình ảnh có thể tiềm ẩn các rủi ro về <b>quyền riêng tư</b> và <b>bản quyền nội dung</b>. Hãy đảm bảo rằng:</i></p>
+        <ul style="list-style-type: none;">
+            <li><b>1️⃣ Quyền Sử Dụng Hợp Pháp:</b> Bạn có quyền sử dụng giọng nói mẫu và nội dung trích xuất từ hình ảnh.</li>
+            <li><b>2️⃣ Nội Dung Phù Hợp:</b> Tránh tạo ra nội dung sai lệch, lừa đảo hoặc gây hiểu nhầm.</li>
+            <li><b>3️⃣ Bảo Mật Dữ Liệu:</b> Thông tin từ hình ảnh và giọng nói mẫu được xử lý an toàn, không bị rò rỉ ra bên ngoài.</li>
+            <li><b>4️⃣ Tuân Thủ Quy Định Pháp Luật:</b> Việc sử dụng chức năng này cần tuân thủ các quy định pháp luật hiện hành về quyền sở hữu trí tuệ và bảo vệ dữ liệu cá nhân.</li>
+        </ul>
+        <div class="alert-footer">👉 Hãy sử dụng chức năng này một cách có trách nhiệm! 🚨</div>
         <div class="row">
             <!-- Left column for image upload -->
             <div class="col-md-6">
@@ -143,13 +188,21 @@
                     </div>
                 </form>
                 <div id="imagePreview" class="image-preview"></div>
+                <div style="display: flex;">
+                    <button id="getTextButton" class="btn btn-primary mt-3" onclick="getTextFromImage()" style="display: none; margin: 10px;">Get Text</button> 
+                    <button id="cancelButton" class="btn btn-danger mt-3" onclick="cancelUpload()" style="display: none; margin: 10px;">Cancel</button>
+                </div>
+                <div id="getTextProgress" class="mt-3"></div>
             </div>
 
             <!-- Right column for other content -->
             <div class="col-md-6">
+                <h3>Text được trích xuất từ ảnh tải lên</h3>
+                <div class="mt-3">
+                    <textarea id="extractedText" class="form-control" rows="8" disabled></textarea> 
+                </div>
                 <h3>Chọn giọng đọc</h3>
                 <div class="mb-3">
-                    <label for="voiceSelect" class="form-label">Chọn giọng đọc</label>
                     <select class="form-select" id="voiceSelect">
                         <option value="0">Chọn giọng đọc</option>
                     </select>

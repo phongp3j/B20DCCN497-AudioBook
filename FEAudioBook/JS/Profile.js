@@ -17,10 +17,10 @@ async function fetchCategories() {
         console.error("Error fetching categories:", error);
     }
 }
-function bookInCategory(categoryId) {
+const bookInCategory = (categoryId) => {
     localStorage.setItem("selectedCategoryId", categoryId);
     window.location.href = "BookInCategory.html";
-}
+};
 async function fetchUserInformation() {
     try {
         const userData = JSON.parse(localStorage.getItem("userData"));
@@ -36,9 +36,9 @@ async function fetchUserInformation() {
         console.error("Error fetching user information:", error);
     }
 }
-function cancel(){
+const cancel = () => {
     window.location.href = "Home.html";
-}
+};
 document.addEventListener("DOMContentLoaded", function () {
     // Lấy dữ liệu user từ localStorage
     const userData = JSON.parse(localStorage.getItem('userData'));

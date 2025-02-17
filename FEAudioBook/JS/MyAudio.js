@@ -17,10 +17,10 @@ async function fetchCategories() {
         console.error("Error fetching categories:", error);
     }
 }
-function bookInCategory(categoryId) {
+const bookInCategory = (categoryId) => {
     localStorage.setItem("selectedCategoryId", categoryId);
     window.location.href = "BookInCategory.html";
-}
+};
 var size;
 async function fetchMyAudios(username) {
     const myAudioTable = document.getElementById("myAudioTableBody");
@@ -52,15 +52,14 @@ async function fetchMyAudios(username) {
     size = index;
 }
 //////////////////////////////////////add audio
-function addMyAudio(){
-    if(size === 6){
+const addMyAudio = () => {
+    if (size === 6) {
         alert('Số lượng âm thanh tối đa là 5.');
-    }
-    else{
+    } else {
         const addAudioModal = new bootstrap.Modal(document.getElementById('addAudioModal'));
         addAudioModal.show();
     }
-}
+};
 // Hàm gửi yêu cầu thêm âm thanh
 async function submitAudio() {
     const audioName = document.getElementById('audioName').value;
@@ -123,15 +122,14 @@ let audioIdToUpdate;
 let updateMediaRecorder;
 let updateAudioChunks = [];
 let audioUrlToUpdate;
-function editMyAudio(audioId, audioName,audioUrl) {
+const editMyAudio = (audioId, audioName, audioUrl) => {
     audioIdToUpdate = audioId;
     audioUrlToUpdate = audioUrl;
     document.getElementById('audioNameUpdate').value = audioName;
     document.getElementById('audioFileUpdate').src = '';
     const updateAudioModal = new bootstrap.Modal(document.getElementById('updateAudio'));
     updateAudioModal.show();
-}
-
+};
 document.getElementById('startRecordingUpdate').addEventListener('click', async () => {
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
     updateMediaRecorder = new MediaRecorder(stream);
@@ -315,11 +313,11 @@ async function submitUpdateAudio() {
 }
 //////////////////////////////////////delete audio
 let audioIdToDelete;
-function deleteMyAudio( audioId) {
+const deleteMyAudio = (audioId) => {
     audioIdToDelete = audioId;
     const deleteAudioModal = new bootstrap.Modal(document.getElementById('deleteConfirmationModal'));
     deleteAudioModal.show();
-}
+};
 document.getElementById('confirmDeleteButton').addEventListener('click', async () => {
     try {
         const response = await fetch(`http://localhost:8080/deleteMyAudio/${audioIdToDelete}`, {

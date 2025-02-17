@@ -17,15 +17,15 @@ async function fetchCategories() {
         console.error("Error fetching categories:", error);
     }
 }
-function bookInCategory(categoryId) {
+const bookInCategory = (categoryId) => {
     localStorage.setItem("selectedCategoryId", categoryId);
     window.location.href = "BookInCategory.html";
-}
+};
 
-function listenNow(bookId) {
+const listenNow = (bookId) => {
     localStorage.setItem("selectedBookIdToListen", bookId);
     window.location.href = "ListenAudioBook.html";
-}
+};
 document.addEventListener("DOMContentLoaded", function () {
     // Lấy dữ liệu user từ localStorage
     const userData = JSON.parse(localStorage.getItem("userData"));
@@ -85,7 +85,7 @@ async function fetchBooks(categoryId, rating) {
     }
 }
 
-function paginateBooks(books, currentPage) {
+const paginateBooks = (books, currentPage) => {
     const booksPerPage = 8; // Số sách trên mỗi trang
     const totalPages = Math.ceil(books.length / booksPerPage); // Tính tổng số trang
     const startIndex = (currentPage - 1) * booksPerPage; // Tính chỉ số bắt đầu của trang hiện tại
@@ -100,31 +100,31 @@ function paginateBooks(books, currentPage) {
         const bookCard = document.createElement("div");
         bookCard.className = "col-md-3 mb-3 d-flex align-items-stretch";
         bookCard.innerHTML = `
-                <div class="card" style="box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); transition: box-shadow 0.3s ease-in-out; width:369px;">
-                    <img src="${book.image}" class="card-img-top" alt="Book Cover" style="padding: 10px; height: 300px; width: 100%; object-fit: contain;">
-                    <div class="card-body d-flex flex-column">
-    <h5 class="card-title">${book.title}</h5>
-    <div class="mt-auto">
-        <p class="card-rating">
-            <em>
-                ${book.rating}/5
-                ${[...Array(5)].map((_, i) => {
-            if (i < Math.floor(book.rating)) {
-                return '<i class="fas fa-star" style="color: gold;"></i>';
-            } else if (i < book.rating) {
-                return '<i class="fas fa-star-half-alt" style="color: gold;"></i>';
-            } else {
-                return '<i class="far fa-star" style="color: gold;"></i>';
-            }
-        }).join('')}
-            </em>
-        </p>
-        <p class="card-category"><em>Thể Loại: ${book.category}</em></p>
-        <a href="#" class="btn btn-primary" onClick="listenNow(${book.id})"><i class="fas fa-play"></i> Listen Now</a>
-    </div>
-</div>
+            <div class="card" style="box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); transition: box-shadow 0.3s ease-in-out; width:369px;">
+                <img src="${book.image}" class="card-img-top" alt="Book Cover" style="padding: 10px; height: 300px; width: 100%; object-fit: contain;">
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title">${book.title}</h5>
+                    <div class="mt-auto">
+                        <p class="card-rating">
+                            <em>
+                                ${book.rating}/5
+                                ${[...Array(5)].map((_, i) => {
+                                    if (i < Math.floor(book.rating)) {
+                                        return '<i class="fas fa-star" style="color: gold;"></i>';
+                                    } else if (i < book.rating) {
+                                        return '<i class="fas fa-star-half-alt" style="color: gold;"></i>';
+                                    } else {
+                                        return '<i class="far fa-star" style="color: gold;"></i>';
+                                    }
+                                }).join('')}
+                            </em>
+                        </p>
+                        <p class="card-category"><em>Thể Loại: ${book.category}</em></p>
+                        <a href="#" class="btn btn-primary" onClick="listenNow(${book.id})"><i class="fas fa-play"></i> Listen Now</a>
+                    </div>
                 </div>
-            `;
+            </div>
+        `;
         bookList.appendChild(bookCard);
     });
 
@@ -135,14 +135,13 @@ function paginateBooks(books, currentPage) {
         const pageItem = document.createElement("li");
         pageItem.className = `page-item${i === currentPage ? " active" : ""}`; //tạo class active cho trang hiện tại
         pageItem.innerHTML = `<a class="page-link" href="#">${i}</a>`;
-        pageItem.addEventListener("click", function (event) {
+        pageItem.addEventListener("click", (event) => {
             event.preventDefault();
             paginateBooks(books, i); // Hiển thị trang thứ i
         });
         pagination.appendChild(pageItem); // Thêm nút phân trang vào phần tử <ul>
     }
-}
-
+};
 //tim kiem
 document.getElementById('searchForm').addEventListener('submit', function (event) {
     event.preventDefault();
@@ -170,8 +169,8 @@ async function fetchCategoryFilter() {
         console.error('Error fetching categories:', error);
     }
 }
-function applyFilters() {
+const applyFilters = () => {
     const categoryId = document.getElementById("categoryFilter").value;
     const rating = document.getElementById("ratingFilter").value;
     fetchBooks(categoryId, rating);
-}
+};

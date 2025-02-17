@@ -17,10 +17,10 @@ async function fetchCategories() {
         console.error("Error fetching categories:", error);
     }
 }
-function bookInCategory(categoryId) {
+const bookInCategory = (categoryId) => {
     localStorage.setItem("selectedCategoryId", categoryId);
     window.location.href = "BookInCategory.html";
-}
+};
 //tim kiem
 document.getElementById('searchForm').addEventListener('submit', function (event) {
     event.preventDefault();
@@ -273,7 +273,7 @@ async function addHistory(audioFile, audioName, chapterTitle, bookTitle) {
 
     }
 }
-function getCurrentDateTime() {
+const getCurrentDateTime = () => {
     const now = new Date();
     const hours = String(now.getHours()).padStart(2, '0');
     const minutes = String(now.getMinutes()).padStart(2, '0');
@@ -283,4 +283,4 @@ function getCurrentDateTime() {
     const year = now.getFullYear();
 
     return `${hours}:${minutes}:${seconds} ${day}/${month}/${year}`;
-}
+};

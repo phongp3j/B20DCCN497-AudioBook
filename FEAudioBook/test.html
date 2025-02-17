@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ITS</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="./CSS/Home.css">
+    <link rel="stylesheet" href="./CSS/ProgressBar.css">
+    <link rel="stylesheet" href="./CSS/PlayPauseButton.css">
+    <style>
+        .image-preview {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .image-preview img {
+            width: 100%;
+            max-width: 350px;
+            height: auto;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .custom-file-input {
+            display: none;
+        }
+
+        .custom-file-label {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #1ABC9C;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .custom-file-label:hover {
+            background-color: #16A085;
+        }
+        .seek-btn {
+            background-color: #1ABC9C;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .seek-btn:hover {
+            background-color: #16A085;
+        }
+
+        .speed-select {
+            background-color: #1ABC9C;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .speed-select:hover {
+            background-color: #16A085;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#"><i class="fas fa-book"></i> Audiobook</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="Home.html"><i class="fas fa-home"></i>
+                            Home</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="categoriesDropdown" role="button"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-list"></i> Categories
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="categoriesDropdown" id="categoriesMenu">
+                            <!-- Categories hiện thị ở đây -->
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="AllBook.html"><i class="fas fa-info-circle"></i> Book</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="ITS.html"><i class="fas fa-image"></i> ITS</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="TTS.html"><i class="fas fa-file-alt"></i> TTS</a>
+                    </li>
+                </ul>
+                <!-- Search Form -->
+                <form class="d-flex ms-lg-3" id="searchForm">
+                    <input class="form-control me-2" type="search" id="searchInput" placeholder="Search Audiobooks"
+                        aria-label="Search">
+                    <button class="btn btn-outline-light" type="submit"><i class="fas fa-search"></i></button>
+                </form>
+                <ul class="navbar-nav ms-lg-3">
+                    <!-- Login/Logout Links -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="#"><i class="fas fa-sign-in-alt"></i> Login</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-5" style="flex: 1;">
+        <h3 class="text-center"><i class="fas fa-image"></i> Sinh âm thanh từ hình ảnh theo giọng đọc tùy chọn</h3>
+        <div class="row">
+            <!-- Left column for image upload -->
+            <div class="col-md-6">
+                <h3>Tải hình ảnh lên</h3>
+                <i>Vui lòng tải lên hình ảnh rõ nét.</i>
+                <br>
+                <form id="imageUploadForm">
+                    <div class="mb-3">
+                        <label for="imageUpload" class="custom-file-label"><i class="fas fa-upload"></i> Chọn hình ảnh</label>
+                        <input class="custom-file-input" type="file" id="imageUpload" multiple>
+                    </div>
+                </form>
+                <div id="imagePreview" class="image-preview"></div>
+            </div>
+
+            <!-- Right column for other content -->
+            <div class="col-md-6">
+                <h3>Chọn giọng đọc</h3>
+                <div class="mb-3">
+                    <label for="voiceSelect" class="form-label">Chọn giọng đọc</label>
+                    <select class="form-select" id="voiceSelect">
+                        <option value="0">Chọn giọng đọc</option>
+                    </select>
+                </div>
+                <!-- Add other content here -->
+                <button class="btn btn-success" onclick="generateAudio()">Sinh âm thanh</button>
+            </div>
+            <div id="audioPlayer" class="mt-3"></div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-4">
+        <div class="container text-center">
+            <p>&copy; 2024 Audiobook. All rights reserved.</p>
+            <div class="social-icons">
+                <a href="#"><i class="fab fa-facebook-f"></i></a>
+                <a href="#"><i class="fab fa-twitter"></i></a>
+                <a href="#"><i class="fab fa-instagram"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS and Popper.js -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.7/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.min.js"></script>
+    <script src="https://unpkg.com/wavesurfer.js"></script>
+    <!-- Custom JS -->
+    <!-- <script src="./JS/ITS.js"></script> -->
+    <script>
+        document.getElementById('imageUpload').addEventListener('change', function (event) {
+            const files = event.target.files;
+            const imagePreview = document.getElementById('imagePreview');
+            imagePreview.innerHTML = ''; // Clear previous images
+            Array.from(files).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    imagePreview.appendChild(img);
+                };
+                reader.readAsDataURL(file);
+            });
+        });
+        async function generateAudio() {
+            const files = document.getElementById('imageUpload').files;
+            let imageUrls = [];
+            const audioPlayer = document.getElementById("audioPlayer");
+            audioPlayer.innerHTML = `
+                <div>
+                    <i id="textProgressBarUpdate">Đang tải thông tin, vui lòng chờ</i>
+                    <div class="progress" id="updateAudioProgress">
+                        <div class="progress-bar" role="progressbar" style="width: 100%;" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                </div>
+            `;
+            for (const file of files) {
+                const formData = new FormData();
+                formData.append('file', file);
+                const response = await fetch('http://localhost:8080/generatePath', {
+                    method: 'POST',
+                    body: formData
+                });
+                if (!response.ok) {
+                    throw new Error('Image upload failed');
+                }
+                const url = await response.text();
+                imageUrls.push(url);
+            }
+            console.log(imageUrls);
+        }
+    </script>
+</body>
+</html>

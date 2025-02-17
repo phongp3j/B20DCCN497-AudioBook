@@ -20,51 +20,50 @@ async function fetchBookDetails() {
             const chapterList = document.getElementById("chapterList");
             chapterList.innerHTML = "";
             book.listChapter.forEach((chapter) => {
-                let chapterHTML = `
-                        <div class="chapter p-3 mb-4 border rounded bg-light shadow-sm">
-    <!-- Tiêu đề chương -->
-    <h3 class="fw-bold mb-3 text-primary">${chapter.title_chapter}</h3>
-    
-    <!-- Dropdown: Chọn giọng có sẵn -->
-    <div class="dropdown mb-2">
-        <button class="btn btn-outline-primary dropdown-toggle w-100 text-start" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-            <i class="bi bi-mic"></i> Chọn giọng có sẵn
-        </button>
-        <ul class="dropdown-menu w-100">
-            ${chapter.listAudio
-                        .map(
-                            (audio) => `
-                        <li>
-                            <a class="dropdown-item d-flex align-items-center" href="#" onclick="displayAudio('${audio.audio_file}','${audio.audio_name}',${chapter.id},'${chapter.title_chapter}','${book.title}')">
-                                <i class="bi bi-volume-up me-2"></i> ${audio.audio_name}
-                            </a>
-                        </li>
-                    `
-                        )
-                        .join("")}
-        </ul>
-    </div>
-
-    <!-- Dropdown: Sử dụng giọng của bạn -->
-    <div class="dropdown mb-2">
-        <button class="btn btn-outline-secondary dropdown-toggle w-100 text-start" type="button" id="userVoicesBtn${chapter.id}"
-            data-bs-toggle="dropdown" aria-expanded="false"
-            onclick="fetchUserVoices(${chapter.id},'${chapter.text}','${chapter.title_chapter}','${book.title}')">
-            <i class="bi bi-person-voice"></i> Sử dụng giọng của bạn
-        </button>
-        <ul class="dropdown-menu w-100" id="userVoicesDropdown${chapter.id}">
-            <!-- Placeholder for user voices -->
-            <li><a class="dropdown-item" href="#">No user voices available</a></li>
-        </ul>
-    </div>
-
-    <!-- Trình phát Audio -->
-    <div id="audioPlayer${chapter.id}" class="mt-4 p-3 border rounded bg-white shadow-sm">
-        <div class="text-center text-muted">Chưa có audio nào được chọn.</div>
-    </div>
-</div>
-
-                    `;
+                const chapterHTML = `
+                            <div class="chapter p-3 mb-4 border rounded bg-light shadow-sm">
+                                <!-- Tiêu đề chương -->
+                                <h3 class="fw-bold mb-3 text-primary">${chapter.title_chapter}</h3>
+                                
+                                <!-- Dropdown: Chọn giọng có sẵn -->
+                                <div class="dropdown mb-2">
+                                    <button class="btn btn-outline-primary dropdown-toggle w-100 text-start" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i class="bi bi-mic"></i> Chọn giọng có sẵn
+                                    </button>
+                                    <ul class="dropdown-menu w-100">
+                                        ${chapter.listAudio
+                                            .map(
+                                                (audio) => `
+                                                    <li>
+                                                        <a class="dropdown-item d-flex align-items-center" href="#" onclick="displayAudio('${audio.audio_file}','${audio.audio_name}',${chapter.id},'${chapter.title_chapter}','${book.title}')">
+                                                            <i class="bi bi-volume-up me-2"></i> ${audio.audio_name}
+                                                        </a>
+                                                    </li>
+                                                `
+                                            )
+                                            .join("")}
+                                    </ul>
+                                </div>
+                        
+                                <!-- Dropdown: Sử dụng giọng của bạn -->
+                                <div class="dropdown mb-2">
+                                    <button class="btn btn-outline-secondary dropdown-toggle w-100 text-start" type="button" id="userVoicesBtn${chapter.id}"
+                                        data-bs-toggle="dropdown" aria-expanded="false"
+                                        onclick="fetchUserVoices(${chapter.id},'${chapter.text}','${chapter.title_chapter}','${book.title}')">
+                                        <i class="bi bi-person-voice"></i> Sử dụng giọng của bạn
+                                    </button>
+                                    <ul class="dropdown-menu w-100" id="userVoicesDropdown${chapter.id}">
+                                        <!-- Placeholder for user voices -->
+                                        <li><a class="dropdown-item" href="#">No user voices available</a></li>
+                                    </ul>
+                                </div>
+                        
+                                <!-- Trình phát Audio -->
+                                <div id="audioPlayer${chapter.id}" class="mt-4 p-3 border rounded bg-white shadow-sm">
+                                    <div class="text-center text-muted">Chưa có audio nào được chọn.</div>
+                                </div>
+                            </div>
+                        `;
                 chapterList.innerHTML += chapterHTML;
             });
         } else {
@@ -269,7 +268,7 @@ async function playUserVoice(audioFile, audioName, chapterId, chapterText, chapt
 
         // Gửi yêu cầu tới API bằng fetch
         const response = await fetch(
-            "https://1594-34-142-147-129.ngrok-free.app/generate", // Thay api ở đây
+            "https://9a28-34-125-188-234.ngrok-free.app/generate", // Thay api ở đây
             {
                 method: "POST",
                 body: formData,

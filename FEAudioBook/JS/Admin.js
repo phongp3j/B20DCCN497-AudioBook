@@ -110,7 +110,7 @@ document.getElementById('nextPage').addEventListener('click', () => {
 });
 ///////////////////////Xoa nguoi dung/////////////////////////////////////////
 let userToDelete = '';
-function deleteUser(username) {
+const deleteUser = (username) => {
     // Tìm người dùng theo username
     const user = users.find(u => u.username === username);
     if (!user) {
@@ -128,7 +128,7 @@ function deleteUser(username) {
     // Hiển thị modal
     const confirmDeleteModal = new bootstrap.Modal(document.getElementById('confirmDeleteModal'));
     confirmDeleteModal.show();
-}
+};
 // Xử lý khi người dùng nhấn nút Xác nhận trong modal
 document.getElementById('confirmDeleteButton').addEventListener('click', async function () {
     try {
@@ -146,7 +146,7 @@ document.getElementById('confirmDeleteButton').addEventListener('click', async f
 });
 /////////////////////////update nguoi dung//////////////////////
 let userToEdit = null; // User cần update
-function editUser(username) {
+const editUser = (username) => {
     // Tìm người dùng theo username
     const user = users.find(u => u.username === username);
     if (!user) {
@@ -164,7 +164,7 @@ function editUser(username) {
     // Hiển thị modal chỉnh sửa
     const editUserModal = new bootstrap.Modal(document.getElementById('editUserModal'));
     editUserModal.show();
-}
+};
 // Xử lý khi người dùng nhấn nút "Lưu" trong modal
 document.getElementById('saveUserButton').addEventListener('click', async function () {
     if (!userToEdit) return;
@@ -203,6 +203,9 @@ document.getElementById('saveUserButton').addEventListener('click', async functi
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 var categories = [];
 var filteredCategories = [];
+let currentCategoryPage = 1;
+const categoriesPerPage = 5; // Số danh mục trên mỗi trang
+let totalCategoryPages = 0;
 document.getElementById('categoryManagement').addEventListener('click', function () {
     // Ẩn nội dung chính
     if (selectedContent === "") {
@@ -223,28 +226,62 @@ const fetchCategories = async () => {
     try {
         var response = await fetch('http://localhost:8080/category/getCategories');
         categories = await response.json();
-        console.log(categories);
-        var categoryTableBody = document.getElementById('categoryTableBody');
-        categoryTableBody.innerHTML = '';
-        categories.forEach(category => {
-            const rowHTML = `
-                <tr>
-                    <td>${category.id}</td>
-                    <td>${category.name}</td>
-                    <td>${category.books}</td>
-                    <td>
-                        <button class="btn btn-primary btn-sm" onclick="editCategory(${category.id})">Chỉnh sửa</button>
-                        <button class="btn btn-danger btn-sm" onclick="deleteCategory(${category.id})">Xóa</button>
-                    </td>
-                </tr>
-            `;
-            categoryTableBody.insertAdjacentHTML('beforeend', rowHTML);
-        });
+        filteredCategories = categories; // Hiển thị toàn bộ danh mục trước khi tìm kiếm
+        totalCategoryPages = Math.ceil(categories.length / categoriesPerPage);
+        displayCategories();
     } catch (error) {
         console.error('Error fetching categories:', error);
         alert('Không thể tải dữ liệu danh mục.');
     }
 };
+// Cập nhật hàm displayCategories() để sử dụng danh sách filteredCategories
+const displayCategories = () => {
+    const start = (currentCategoryPage - 1) * categoriesPerPage;
+    const end = start + categoriesPerPage;
+    const paginatedCategories = filteredCategories.slice(start, end);
+    const categoryTableBody = document.getElementById('categoryTableBody');
+    categoryTableBody.innerHTML = '';
+    paginatedCategories.forEach(category => {
+        const rowHTML = `
+            <tr>
+                <td>${category.id}</td>
+                <td>${category.name}</td>
+                <td>${category.books}</td>
+                <td>
+                    <button class="btn btn-primary btn-sm" onclick="editCategory(${category.id})">Chỉnh sửa</button>
+                    <button class="btn btn-danger btn-sm" onclick="deleteCategory(${category.id})">Xóa</button>
+                </td>
+            </tr>
+        `;
+        categoryTableBody.insertAdjacentHTML('beforeend', rowHTML);
+    });
+    document.getElementById('categoryPrevPage').style.display = currentCategoryPage === 1 ? 'none' : 'block';
+    document.getElementById('categoryNextPage').style.display = end >= filteredCategories.length ? 'none' : 'block';
+    document.getElementById('categoryPageInfo').innerHTML = `Trang ${currentCategoryPage} / ${totalCategoryPages}`;
+};
+
+const changeCategoryPage = (newPage) => {
+    if (newPage < 1 || newPage > totalCategoryPages) return;
+    currentCategoryPage = newPage;
+    displayCategories();
+};
+
+// Gọi hàm fetchCategories() để lấy dữ liệu khi trang được tải
+document.addEventListener('DOMContentLoaded', fetchCategories);
+
+document.getElementById('categoryPrevPage').addEventListener('click', () => {
+    if (currentCategoryPage > 1) {
+        currentCategoryPage--;
+        displayCategories();
+    }
+});
+
+document.getElementById('categoryNextPage').addEventListener('click', () => {
+    if (currentCategoryPage * categoriesPerPage < categories.length) {
+        currentCategoryPage++;
+        displayCategories();
+    }
+});
 // Lắng nghe sự kiện khi nhấn nút Thêm danh mục
 document.getElementById('categoryAddButton').addEventListener('click', function () {
     // Hiển thị modal
@@ -296,7 +333,7 @@ document.getElementById('addCategoryButton').addEventListener('click', function 
 });
 /////////////////////////update category//////////////////////
 let idCategoryToEdit = null;
-function editCategory(idCategory) {
+const editCategory = (idCategory) => {
     const category = categories.find(u => u.id === idCategory);
     if (!category) {
         return;
@@ -306,7 +343,7 @@ function editCategory(idCategory) {
     // Hiển thị modal chỉnh sửa
     const editCategoryModal = new bootstrap.Modal(document.getElementById('editCategoryModal'));
     editCategoryModal.show();
-}
+};
 // Xử lý khi người dùng nhấn nút "Lưu" trong modal
 document.getElementById('saveCategoryButton').addEventListener('click', async function () {
     // Lấy dữ liệu từ form và tạo request body theo DTO
@@ -340,7 +377,7 @@ document.getElementById('saveCategoryButton').addEventListener('click', async fu
 });
 ///////////////////////Xoa danh mục/////////////////////////////////////////
 let idCategoryToDelete = null;
-function deleteCategory(idCategory) {
+const deleteCategory = (idCategory) => {
     const category = categories.find(u => u.id === idCategory);
     if (!category) {
         return;
@@ -350,7 +387,7 @@ function deleteCategory(idCategory) {
     // Hiển thị modal
     const confirmDeleteModal = new bootstrap.Modal(document.getElementById('confirmDeleteModalCategory'));
     confirmDeleteModal.show();
-}
+};
 // Xử lý khi người dùng nhấn nút Xác nhận trong modal
 document.getElementById('confirmDeleteCategoryButton').addEventListener('click', async function () {
     try {
@@ -372,28 +409,9 @@ const searchCategories = () => {
     filteredCategories = categories.filter(category =>
         category.name.toLowerCase().includes(searchTerm)
     );
-    console.log(filteredCategories);
+    totalCategoryPages = Math.ceil(filteredCategories.length / categoriesPerPage);
+    currentCategoryPage = 1; // Reset lại trang về 1
     displayCategories(); // Hiển thị danh mục đã lọc
-};
-// Hàm để hiển thị danh mục (cập nhật để sử dụng filteredCategories)
-const displayCategories = () => {
-    const categoryTableBody = document.getElementById('categoryTableBody');
-    categoryTableBody.innerHTML = ''; // Xóa nội dung cũ
-    console.log(filteredCategories);
-    filteredCategories.forEach(category => {
-        const rowHTML = `
-            <tr>
-                <td>${category.id}</td>
-                <td>${category.name}</td>
-                <td>${category.books}</td>
-                <td>
-                    <button class="btn btn-primary btn-sm" onclick="editCategory(${category.id})">Chỉnh sửa</button>
-                    <button class="btn btn-danger btn-sm" onclick="deleteCategory(${category.id})">Xóa</button>
-                </td>
-            </tr>
-        `;
-        categoryTableBody.insertAdjacentHTML('beforeend', rowHTML);
-    });
 };
 // Bắt sự kiện khi nhấn nút tìm kiếm
 document.getElementById('categorySearchButton').addEventListener('click', searchCategories);
@@ -408,6 +426,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 ///////////////////////////////////////////////Book Management/////////////////////////////////////////////////////////////
 var books = [];
 var filteredBooks = [];
+let currentBookPage = 1;
+const booksPerPage = 5; // Số sách trên mỗi trang
+let totalBookPages = 0;
 // Lắng nghe sự kiện click trên button quản lý sách
 document.getElementById('bookManagement').addEventListener('click', function () {
     // Ẩn nội dung chính
@@ -420,6 +441,7 @@ document.getElementById('bookManagement').addEventListener('click', function () 
     document.getElementById('bookTable').classList.remove('d-none');
     selectedContent = "bookTable"; // Cập nhật nội dung được chọn
     fetchBooks(); // Gọi hàm fetchBooks để lấy sách
+    filteredBooks = books; // Hiển thị toàn bộ sách trước khi tìm kiếm
     updateActiveMenu('bookManagement');
 });
 // Hàm lấy dữ liệu sách từ API
@@ -427,32 +449,37 @@ const fetchBooks = async () => {
     try {
         const response = await fetch('http://localhost:8080/book/0/0');
         books = await response.json();
+        totalBookPages = Math.ceil(books.length / booksPerPage);
         displayBooks(); // Gọi hàm để hiển thị danh sách sách sau khi fetch
     } catch (error) {
         alert('Không thể tải dữ liệu sách.');
     }
 };
-// Tìm kiếm sách
+// Hàm để tìm kiếm sách
 const searchBooks = () => {
     const searchTerm = document.getElementById('bookSearchInput').value.toLowerCase();
     filteredBooks = books.filter(book =>
-        book.title.toLowerCase().includes(searchTerm)
+        book.title.toLowerCase().includes(searchTerm) ||
+        book.category.toLowerCase().includes(searchTerm) ||
+        book.author.toLowerCase().includes(searchTerm)
     );
-    console.log(filteredBooks);
-    displayBooks(); // Gọi hàm để hiển thị danh sách sách đã lọc
+    totalBookPages = Math.ceil(filteredBooks.length / booksPerPage);
+    currentBookPage = 1; // Reset lại trang về 1
+    displayBooks();
 };
+// Bắt sự kiện khi nhấn nút tìm kiếm
+document.getElementById('bookSearchButton').addEventListener('click', searchBooks);
+// Bắt sự kiện khi người dùng nhập vào ô tìm kiếm (tự động tìm kiếm)
+document.getElementById('bookSearchInput').addEventListener('input', searchBooks);
 /// Hàm hiển thị sách
 const displayBooks = () => {
+    const start = (currentBookPage - 1) * booksPerPage;
+    const end = start + booksPerPage;
+    const paginatedBooks = filteredBooks.slice(start, end);
     const bookTableBody = document.getElementById('bookTableBody');
     bookTableBody.innerHTML = ''; // Xóa nội dung cũ
-    const booksToDisplay = filteredBooks.length > 0 ? filteredBooks : books; // Nếu không có kết quả lọc, hiển thị tất cả sách
-    // Kiểm tra nếu không có sách nào để hiển thị
-    if (booksToDisplay.length === 0) {
-        alert('Không có dữ liệu'); // Hiển thị cảnh báo
-        return; // Kết thúc hàm
-    }
     // Hiển thị sách
-    booksToDisplay.forEach(book => {
+    paginatedBooks.forEach(book => {
         const rowHTML = `
              <tr>
                  <td>${book.id}</td>
@@ -470,13 +497,30 @@ const displayBooks = () => {
          `;
         bookTableBody.insertAdjacentHTML('beforeend', rowHTML);
     });
+    document.getElementById('bookPrevPage').style.display = currentBookPage === 1 ? 'none' : 'block';
+    document.getElementById('bookNextPage').style.display = end >= filteredBooks.length ? 'none' : 'block';
+    document.getElementById('bookPageInfo').innerHTML = `Trang ${currentBookPage} / ${totalBookPages}`;
 };
-// Hàm khởi tạo hiển thị sách ban đầu
-const initializeBooksDisplay = () => {
-    fetchBooks();
+const changeBookPage = (newPage) => {
+    if (newPage < 1 || newPage > totalBookPages) return;
+    currentBookPage = newPage;
+    displayBooks();
 };
-// Gọi hàm khởi tạo khi trang được tải
-document.addEventListener('DOMContentLoaded', initializeBooksDisplay);
+document.getElementById('bookPrevPage').addEventListener('click', () => {
+    if (currentBookPage > 1) {
+        currentBookPage--;
+        displayBooks();
+    }
+});
+
+document.getElementById('bookNextPage').addEventListener('click', () => {
+    if (currentBookPage * booksPerPage < books.length) {
+        currentBookPage++;
+        displayBooks();
+    }
+});
+// Gọi hàm fetchBooks() để lấy dữ liệu khi trang được tải
+document.addEventListener('DOMContentLoaded', fetchBooks);
 // Bắt sự kiện khi nhấn nút tìm kiếm
 document.getElementById('bookSearchButton').addEventListener('click', searchBooks);
 // Bắt sự kiện khi người dùng nhập vào ô tìm kiếm (tự động tìm kiếm)
@@ -563,7 +607,7 @@ async function generateAudioAdmin(text, audioFile) {
 
         // Gửi yêu cầu tới API bằng fetch
         const response = await fetch(
-            "https://86ee-34-125-88-118.ngrok-free.app/generate", // Thay api ở đây
+            "https://9a28-34-125-188-234.ngrok-free.app/generate", // Thay api ở đây
             {
                 method: "POST",
                 body: formData,
@@ -795,9 +839,9 @@ document.getElementById('bookSearchButtonStat').addEventListener('click', search
 // Bắt sự kiện khi người dùng nhập vào ô tìm kiếm (tự động tìm kiếm)
 document.getElementById('bookSearchInputStat').addEventListener('input', searchBooksStat);
 
-function statReviewsOfBook(bookId) {
+const statReviewsOfBook = (bookId) => {
     // Lưu id sách vào localStorage
     localStorage.setItem('bookIdToStatReviewAdmin', bookId);
     // Điều hướng tới trang chi tiết sách
     window.location.href = 'StatisticalReview.html';
-}
+};

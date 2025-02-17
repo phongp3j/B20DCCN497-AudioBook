@@ -17,11 +17,10 @@ async function fetchCategories() {
         console.error("Error fetching categories:", error);
     }
 }
-function bookInCategory(categoryId) {
+const bookInCategory = (categoryId) => {
     localStorage.setItem("selectedCategoryId", categoryId);
     window.location.href = "BookInCategory.html";
-}
-
+};
 document.addEventListener("DOMContentLoaded", function () {
     // Lấy dữ liệu user từ localStorage
     const userData = JSON.parse(localStorage.getItem("userData"));
@@ -66,7 +65,7 @@ document.addEventListener("DOMContentLoaded", function () {
     fetchCategories();
     fetchListenHistory();
 });
-function paginateListenHistory(listenHistory, currentPage) {
+const paginateListenHistory = (listenHistory, currentPage) => {
     const itemsPerPage = 10; // Số lượng listen history mỗi trang
     const totalPages = Math.ceil(listenHistory.length / itemsPerPage); // Tính tổng số trang
     const startIndex = (currentPage - 1) * itemsPerPage; // Chỉ mục bắt đầu của trang hiện tại
@@ -100,14 +99,14 @@ function paginateListenHistory(listenHistory, currentPage) {
         pageItem.innerHTML = `<a class="page-link" href="#">${i}</a>`;
 
         // Thêm sự kiện nhấp chuột để chuyển trang
-        pageItem.addEventListener("click", function (event) {
+        pageItem.addEventListener("click", (event) => {
             event.preventDefault();
             paginateListenHistory(listenHistory, i); // Gọi lại hàm với trang đã chọn
         });
 
         pagination.appendChild(pageItem); // Thêm mục phân trang vào DOM
     }
-}
+};
 
 // Hàm để tải dữ liệu listen history từ API một lần và hiển thị
 async function fetchListenHistory() {

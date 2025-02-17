@@ -17,10 +17,10 @@ async function fetchCategories() {
         console.error("Error fetching categories:", error);
     }
 }
-function bookInCategory(categoryId) {
+const bookInCategory = (categoryId) => {
     localStorage.setItem("selectedCategoryId", categoryId);
     window.location.href = "BookInCategory.html";
-}
+};
 //tim kiem
 document.getElementById('searchForm').addEventListener('submit', function (event) {
     event.preventDefault();
@@ -79,6 +79,7 @@ document.addEventListener("DOMContentLoaded", function () {
 //////////////////////////////////////////
 document.getElementById("imageUpload").addEventListener("change", function () {
     const imagePreview = document.getElementById("imagePreview");
+    const getTextButton = document.getElementById("getTextButton");
     imagePreview.innerHTML = ""; // Clear previous preview
     Array.from(this.files).forEach(file => {
         const reader = new FileReader();
@@ -89,7 +90,22 @@ document.getElementById("imageUpload").addEventListener("change", function () {
         };
         reader.readAsDataURL(file);
     });
+    getTextButton.style.display = "block";
+    cancelButton.style.display = "block";
 });
+function cancelUpload() {
+    const imagePreview = document.getElementById("imagePreview");
+    const getTextButton = document.getElementById("getTextButton");
+    const cancelButton = document.getElementById("cancelButton");
+    const imageUpload = document.getElementById("imageUpload");
+    const extractedText = document.getElementById("extractedText");
+    imagePreview.innerHTML = ""; 
+    getTextButton.style.display = "none";
+    cancelButton.style.display = "none"; 
+    imageUpload.value = "";
+    extractedText.value = "";
+    extractedText.disabled = true;
+}
 // Hàm để lấy danh sách giọng của người dùng
 async function fetchVoices() {
     const userData = JSON.parse(localStorage.getItem("userData"));
@@ -112,21 +128,10 @@ async function fetchVoices() {
     }
 }
 //////////////////////
-async function generateAudio() {
+async function getTextFromImage() {
     const files = document.getElementById("imageUpload").files;
-    const selectedVoice = document.getElementById("voiceSelect").value;
-    const selectedVoiceName = document.getElementById("voiceSelect").textContent;
-    if (files.length === 0) {
-        alert("Vui lòng tải ảnh lên.");
-        return;
-    }
-    if (selectedVoice == 0) {
-        alert("Vui lòng chọn giọng đọc.");
-        return;
-    }
-    let imageUrls = "";
-    const audioPlayer = document.getElementById("audioPlayer");
-    audioPlayer.innerHTML = `
+    const getTextProgress = document.getElementById("getTextProgress");
+    getTextProgress.innerHTML = `
         <div>
               <i id="textProgressBarUpdate" >Đang tải thông tin, vui lòng chờ</i>
               <div class="progress" id="updateAudioProgress" >
@@ -134,6 +139,11 @@ async function generateAudio() {
             </div>
             </div>
             `;
+    if (files.length === 0) {
+        alert("Vui lòng tải ảnh lên.");
+        return;
+    }
+    let imageUrls = "";
     for (const file of files) {
         const formData = new FormData();
         formData.append('file', file);
@@ -147,8 +157,9 @@ async function generateAudio() {
         const url = await response.text();
         imageUrls = imageUrls + url;
     }
+    console.log("Image URLs:", imageUrls);
     try {
-        const extractTextResponse = await fetch('https://dca1-34-124-234-5.ngrok-free.app/getText', {
+        const extractTextResponse = await fetch('https://dd86-34-125-108-62.ngrok-free.app/getText', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -160,24 +171,52 @@ async function generateAudio() {
         }
         const extractTextData = await extractTextResponse.json();
         console.log("Extracted text:", extractTextData.text_from_image);
-        playUserVoice(extractTextData.text_from_image, selectedVoice,selectedVoiceName);
+        const extractedText = document.getElementById('extractedText');
+        //extractedText.value = "Sự dũng cảm sẽ tạo cho bạn khả năng dám chất vấn những điều làm bạn sợ hãi. Bạn có thể nhìn thấy điều đó khi những đứa thái tri trẻ nhút nhát gạt bỏ sự e ngại để nói chuyện với bạn học của chúng trên sân chơi, khi một người tiên phong tìm ra lãnh thổ mới không màng rủi ro, khi một người lính cứu hỏa chạy thẳng vào một ngôi nhà đang cháy để cứu người, bất chấp khả năng bản thân sẽ bị thương, hay khi một người bạn thân phát biểu trong bữa tiệc sinh nhật của bạn dù cô ấy mắc chứng sợ nói trước đám đông. Dũng cảm không phải là trở nên liều lĩnh. Liều lĩnh là khi bạn lái xe sai làn trên đường đông, hoặc nhảy từ vực cao mà không biết dòng nước bên dưới sâu bao nhiêu. Liều lĩnh là việc bạn chấp nhận những rủi ro không đáng có - rủi ro thiếu trách nhiệm. Trong khi đó dũng cảm là khi bạn dám chấp nhận những rủi ro thích đáng - rủi ro đáng giá trong cuộc đời bạn.";
+        extractedText.value = extractTextData.text_from_image;
+        extractedText.disabled = false;
+        getTextProgress.innerHTML = "";
     } catch (error) {
         alert("Có lỗi xảy ra vui lòng thử lại.");
-        location.reload();
+        return;
     }
+}
+async function generateAudio() {
+    const selectedVoice = document.getElementById("voiceSelect").value;
+    const selectedVoiceName = document.getElementById("voiceSelect").selectedOptions[0].textContent;
+    console.log("Selected voice:", selectedVoiceName);
+    if (selectedVoice == 0) {
+        alert("Vui lòng chọn giọng đọc.");
+        return;
+    }
+    const audioPlayer = document.getElementById("audioPlayer");
+    audioPlayer.innerHTML = `
+        <div>
+              <i id="textProgressBarUpdate" >Đang tải thông tin, vui lòng chờ</i>
+              <div class="progress" id="updateAudioProgress" >
+                <div class="progress-bar" role="progressbar" style="width: 100%;" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+            </div>
+            `;
+    const text = document.getElementById("extractedText").value;
+    if (!text) {
+        alert("Vui lòng tải ảnh và trích xuất văn bản trước.");
+        return;
+    }
+    console.log("Text to convert:", text);
+    playUserVoice(text, selectedVoice, selectedVoiceName);
 }
 const chapterId = 1;
 // Hàm để phát giọng người dùng và gửi dữ liệu đến API
-async function playUserVoice(text, audioFile,audioName) {
+async function playUserVoice(text, audioFile, audioName) {
     try {
         // Tạo formData để gửi tới API
         const formData = new FormData();
         formData.append("text", text); // Gửi text
         formData.append("audio_url", audioFile); // Gửi audio dưới dạng File
-
         // Gửi yêu cầu tới API bằng fetch
         const response = await fetch(
-            "https://1594-34-142-147-129.ngrok-free.app/generate", // Thay api ở đây
+            "https://9a28-34-125-188-234.ngrok-free.app/generate", // Thay api ở đây
             {
                 method: "POST",
                 body: formData,
@@ -223,67 +262,67 @@ async function playUserVoice(text, audioFile,audioName) {
                     00:00 / 00:00
                 </div>
             `;
-    // Khởi tạo Wavesurfer
-    const wavesurfer = WaveSurfer.create({
-        container: `#waveform${chapterId}`,
-        waveColor: '#A8DBA8',
-        progressColor: '#3B8686',
-        barWidth: 2,
-        height: 100,
-        responsive: true
-    });
-    // Tải file âm thanh từ URL
-    wavesurfer.load(data.audio_file_url);
-    // Biến cờ để xác định play lần đầu
-    let isFirstPlay = true;
-    // Lắng nghe sự kiện 'play' chỉ lần đầu tiên
-    wavesurfer.on('play', function () {
-        if (isFirstPlay) {
-            addHistory(audioFile, audioName, "Image to Speech", "Image to Speech");
-            isFirstPlay = false; // Đặt cờ để không chạy lại lần sau
-        }
-    });
-    // Xử lý tua lại 10 giây
-    document.getElementById(`seekBackwardBtn${chapterId}`).addEventListener("click", function () {
-        wavesurfer.seekTo((wavesurfer.getCurrentTime() - 10) / wavesurfer.getDuration());
-    });
-    // Xử lý tua tới 10 giây
-    document.getElementById(`seekForwardBtn${chapterId}`).addEventListener("click", function () {
-        wavesurfer.seekTo((wavesurfer.getCurrentTime() + 10) / wavesurfer.getDuration());
-    });
-    // Xử lý thay đổi tốc độ phát với select
-    document.getElementById(`speedSelect${chapterId}`).addEventListener("change", function () {
-        const newSpeed = parseFloat(this.value);
-        wavesurfer.setPlaybackRate(newSpeed);
-    });
-    // Xử lý play/pause với một nút tùy chỉnh
-    document.getElementById(`playPauseBtn${chapterId}`).addEventListener("click", function () {
-        wavesurfer.playPause();
-        updatePlayPauseIcon(); // Cập nhật biểu tượng nút play/pause
-    });
-    // Cập nhật thời gian phát
-    wavesurfer.on('audioprocess', function () {
-        const currentTime = formatTime(wavesurfer.getCurrentTime());
-        const duration = formatTime(wavesurfer.getDuration());
-        document.getElementById(`time-display${chapterId}`).textContent = `${currentTime} / ${duration}`;
-    });
-    // Định dạng thời gian (MM:SS)
-    function formatTime(seconds) {
-        const minutes = Math.floor(seconds / 60);
-        const secs = Math.floor(seconds % 60);
-        return `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-    }
-    // Hàm cập nhật biểu tượng nút Play/Pause
-    function updatePlayPauseIcon() {
-        const playPauseBtn = document.getElementById(`playPauseBtn${chapterId}`);
-        if (wavesurfer.isPlaying()) {
-            playPauseBtn.classList.remove('show-play');
-            playPauseBtn.classList.add('show-pause');
-        } else {
-            playPauseBtn.classList.remove('show-pause');
-            playPauseBtn.classList.add('show-play');
-        }
-    }
+            // Khởi tạo Wavesurfer
+            const wavesurfer = WaveSurfer.create({
+                container: `#waveform${chapterId}`,
+                waveColor: '#A8DBA8',
+                progressColor: '#3B8686',
+                barWidth: 2,
+                height: 100,
+                responsive: true
+            });
+            // Tải file âm thanh từ URL
+            wavesurfer.load(data.audio_file_url);
+            // Biến cờ để xác định play lần đầu
+            let isFirstPlay = true;
+            // Lắng nghe sự kiện 'play' chỉ lần đầu tiên
+            wavesurfer.on('play', function () {
+                if (isFirstPlay) {
+                    addHistory(audioFile, audioName, "Image to Speech", "Image to Speech");
+                    isFirstPlay = false; // Đặt cờ để không chạy lại lần sau
+                }
+            });
+            // Xử lý tua lại 10 giây
+            document.getElementById(`seekBackwardBtn${chapterId}`).addEventListener("click", function () {
+                wavesurfer.seekTo((wavesurfer.getCurrentTime() - 10) / wavesurfer.getDuration());
+            });
+            // Xử lý tua tới 10 giây
+            document.getElementById(`seekForwardBtn${chapterId}`).addEventListener("click", function () {
+                wavesurfer.seekTo((wavesurfer.getCurrentTime() + 10) / wavesurfer.getDuration());
+            });
+            // Xử lý thay đổi tốc độ phát với select
+            document.getElementById(`speedSelect${chapterId}`).addEventListener("change", function () {
+                const newSpeed = parseFloat(this.value);
+                wavesurfer.setPlaybackRate(newSpeed);
+            });
+            // Xử lý play/pause với một nút tùy chỉnh
+            document.getElementById(`playPauseBtn${chapterId}`).addEventListener("click", function () {
+                wavesurfer.playPause();
+                updatePlayPauseIcon(); // Cập nhật biểu tượng nút play/pause
+            });
+            // Cập nhật thời gian phát
+            wavesurfer.on('audioprocess', function () {
+                const currentTime = formatTime(wavesurfer.getCurrentTime());
+                const duration = formatTime(wavesurfer.getDuration());
+                document.getElementById(`time-display${chapterId}`).textContent = `${currentTime} / ${duration}`;
+            });
+            // Định dạng thời gian (MM:SS)
+            function formatTime(seconds) {
+                const minutes = Math.floor(seconds / 60);
+                const secs = Math.floor(seconds % 60);
+                return `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+            }
+            // Hàm cập nhật biểu tượng nút Play/Pause
+            function updatePlayPauseIcon() {
+                const playPauseBtn = document.getElementById(`playPauseBtn${chapterId}`);
+                if (wavesurfer.isPlaying()) {
+                    playPauseBtn.classList.remove('show-play');
+                    playPauseBtn.classList.add('show-pause');
+                } else {
+                    playPauseBtn.classList.remove('show-pause');
+                    playPauseBtn.classList.add('show-play');
+                }
+            }
         } else {
             console.error("Error with API request:", response.status);
             audioPlayer.innerHTML = `
@@ -317,7 +356,7 @@ async function addHistory(audioFile, audioName, chapterTitle, bookTitle) {
 
     }
 }
-function getCurrentDateTime() {
+const getCurrentDateTime = () => {
     const now = new Date();
     const hours = String(now.getHours()).padStart(2, '0');
     const minutes = String(now.getMinutes()).padStart(2, '0');
@@ -327,4 +366,4 @@ function getCurrentDateTime() {
     const year = now.getFullYear();
 
     return `${hours}:${minutes}:${seconds} ${day}/${month}/${year}`;
-}
+};

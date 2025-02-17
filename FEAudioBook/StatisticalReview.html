@@ -165,7 +165,7 @@
                                 reviewsContainer.appendChild(reviewCard);
                             });
                         } else {
-                            console.error("Expected an array of reviews");
+                            console.error("Lỗi khi tải thông tin đánh giá");
                         }
                     }
                     catch (error) {
@@ -234,6 +234,18 @@
             });
         }
         document.addEventListener('DOMContentLoaded', renderChart);
+        const filterReviews = () => {
+            const filterValue = document.getElementById('filterSelect').value;
+            const reviewCards = document.querySelectorAll('.review-card');
+            reviewCards.forEach((card) => {
+                const rating = card.querySelector('.review-rating').textContent.length;
+                if (filterValue === 'all' || rating === parseInt(filterValue)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        };
     </script>
 </body>
 
